@@ -1,0 +1,29 @@
+{
+  "name": "snytplusplus",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "mocha || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hapseleg/SNYTPlusPlus.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "chai": "^4.1.2",
+    "express": "^4.16.2",
+    "mocha": "^4.0.1",
+    "mongodb": "^2.2.33",
+    "mongoose": "^4.13.2",
+    "morgan": "^1.9.0",
+    "pug": "^2.0.0-rc.4"
+  },
+  "bugs": {
+    "url": "https://github.com/Hapseleg/SNYTPlusPlus/issues"
+  },
+  "homepage": "https://github.com/Hapseleg/SNYTPlusPlus#readme"
+}
