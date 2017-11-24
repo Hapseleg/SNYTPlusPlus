@@ -12,13 +12,14 @@ var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
 var app = express();
 
 app.use(express.static('public'));
+mongoose.Promise = global.Promise;
 
 mongoClient.connect(mongoUrl, function (err, db) {
     if(err) {
         throw err;
     }
     console.log("Connected successfully to server");
-    app.Snyt = db.collection('Snyt');
+    app.Snyt = db.collection('snyts');
     db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
         if (err) {
             throw err
@@ -36,10 +37,30 @@ app.use(morgan('tiny'));
 app.set('view engine', 'pug');
 
 app.get('/',function (req,res) {
-
+    res.render('index');
 });
 
+app.get('/opretsnyt', function (req,res) {
+    res.render('createSnyt');
+});
 
+app.post('/opretsnyt',function (req,res) {
+    var newSnyt = new SNYT();
+    newSnyt.subject = req.body.snyt.subject;
+    newSnyt.category = req.body.snyt.category;
+    newSnyt.text = req.body.snyt.text;
+    newSnyt.user = req.body.snyt.user;
+    newSnyt.created = req.body.snyt.created;
+    newSnyt.edok = req.body.snyt.edok;
+
+    newSnyt.save(function (err, snyt) {
+       if(err){
+           res.send('Error:'+err.toString());
+       }
+    });
+
+    res.redirect('/');
+});
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
 app.listen(1337);

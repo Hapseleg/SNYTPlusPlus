@@ -58,6 +58,7 @@ describe('Create SNYT test', function () {
             assert.equal(newSnyt.user,doc[0].user);
             assert.equal(newSnyt.created,doc[0].created);
             assert.equal(newSnyt.edok,doc[0].edok);
+            done();
         });
         console.log("HENTET SNYT:");
         console.log(hentetSnyt);
