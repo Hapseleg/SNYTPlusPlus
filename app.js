@@ -5,24 +5,26 @@ var express = require('express'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     rp = require('request-promise'),
-    Joke = require('./models/Joke.model');
+    Snyt = require('./models/Snyt.model');
+
+var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
 
 var app = express();
 
 app.use(express.static('public'));
 
-// mongoClient.connect(mongoUrl, function (err, db) {
-//     if(err) {
-//         throw err;
-//     }
-//     console.log("Connected successfully to server")
-//     app.jokes = db.collection('jokes')
-//     db.ensureIndex('setup', 'punchline', function (err) {
-//         if (err) {
-//             throw err
-//         }
-//     });
-// });
+mongoClient.connect(mongoUrl, function (err, db) {
+    if(err) {
+        throw err;
+    }
+    console.log("Connected successfully to server");
+    app.Snyt = db.collection('Snyt');
+    db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
+        if (err) {
+            throw err
+        }
+    });
+});
 
 mongoose.connect(mongoUrl, {
     useMongoClient: true
@@ -41,3 +43,5 @@ app.get('/',function (req,res) {
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
 app.listen(1337);
+
+module.exports = mongoClient;

@@ -9,7 +9,8 @@ var SnytSchema = new Schema({
     category: String,
     text: String,
     user: String,
-    created: {type: Date, default: Date.now}
+    created: {type: Date, default: Date.now},
+    edok : String
 });
 
 module.exports = mongoose.model('Snyt', SnytSchema);
