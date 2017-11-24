@@ -13,4 +13,4 @@ var SnytSchema = new Schema({
     edok : String
 });
 
-module.exports = mongoose.model('Snyt', SnytSchema);
+module.exports = mongoose.model('Snyts', SnytSchema);
