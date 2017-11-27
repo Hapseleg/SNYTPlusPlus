@@ -41,11 +41,14 @@ app.get('/',function (req,res) {
 });
 
 app.get('/opretsnyt', function (req,res) {
-    res.render('createSnyt');
+    // var today = Date();
+    // console.log("TODAY");
+    // console.log(today);
+    res.render('createSnyt');//, {date: today});
 });
 
 app.post('/opretsnyt',function (req,res) {
-    var newSnyt = new SNYT();
+    var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
     newSnyt.text = req.body.snyt.text;
@@ -53,6 +56,7 @@ app.post('/opretsnyt',function (req,res) {
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
 
+    console.log(newSnyt);
     newSnyt.save(function (err, snyt) {
        if(err){
            res.send('Error:'+err.toString());
