@@ -6,6 +6,11 @@ var express = require('express'),
     mongoose = require('mongoose'),
     rp = require('request-promise'),
     Joke = require('./models/Joke.model');
+var Snyt = require('./models/Snyt.model');
+var mongoUrl = 'mongodb://localhost:27017/testsnyt';
+mongoose.Promise = global.Promise;
+
+
 
 var app = express();
 
@@ -35,6 +40,14 @@ app.set('view engine', 'pug');
 
 app.get('/',function (req,res) {
 
+});
+
+app.get('/snyt/:id', function (req, res) {
+    Snyt.find({_id: req.params.id}).exec().then(function(snyt) {
+        res.json(snyt);
+    }).catch(function (err) {
+        console.log('du er blevet snyt (: '+err);
+    });
 });
 
 
