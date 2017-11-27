@@ -40,7 +40,7 @@ app.use(morgan('tiny'));
 app.use(cookieSession({
     name:'session',
     keys:['hejKaj123'],//hash seed
-    maxAge: 8*60*60*1000 //(1 time * 60 minutter * 60 sekunder * 1000 mili) = 8 timer i mili sek
+    maxAge: 8*60*60*1000 //(8 time * 60 minutter * 60 sekunder * 1000 mili) = 8 timer i mili sek
 }));
 
 app.use(function(req,res,next){
@@ -86,6 +86,7 @@ app.post('/',function (req,res) {
         }
         else{
             req.session.loggedIn = doc._id;
+            // res.send(doc);
             res.redirect('/');
         }
     });
@@ -117,7 +118,6 @@ app.post('/opretsnyt',function (req,res) {
            res.send('Error:'+err.toString());
        }
     });
-
     res.redirect('/');
 });
 
