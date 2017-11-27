@@ -41,19 +41,20 @@ app.get('/',function (req,res) {
 });
 
 app.get('/opretsnyt', function (req,res) {
-    res.render('createSnyt');
+    // var today = Date();
+    // console.log("TODAY");
+    // console.log(today);
+    res.render('createSnyt');//, {date: today});
 });
 
 app.post('/opretsnyt',function (req,res) {
-    var newSnyt = new SNYT();
+    var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
     newSnyt.text = req.body.snyt.text;
     newSnyt.user = req.body.snyt.user;
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
-
-
 
     newSnyt.save(function (err, snyt) {
        if(err){
@@ -71,7 +72,74 @@ app.get('/snyt/:id', function (req, res) {
         console.log('du er blevet snyt hehe (: '+err);
     });
 });
+app.get('/search', function(req, res) {
+    Snyt.find({}).exec(function(err, doc) {
+        if(err) {
+            throw err;
+        } else {
+            res.json(doc);
+        }
+    });
+});
 
+app.get('/search/:text', function(req, res) {
+    var reg = new RegExp(".*" + req.params.text + ".*", "i");
+    Snyt.find({"$or":[{"subject": reg}, {"text": reg}]}).exec(function(err, doc) {
+        if(err) {
+            throw err;
+        } else {
+            res.json(doc);
+        }
+    });
+});
+
+app.post('/search', function(req, res) {
+    var text = req.body.text;
+    var dateFrom = new Date(req.body.dateFrom).toISOString();
+    var dateTo = new Date(req.body.dateTo).toISOString();
+    var read = req.body.read;
+    var category = req.body.category;
+    var regExText = new RegExp(".*" + text + ".*", "i");
+    console.log(req.body);
+    var readOption = {};
+    var categoryOption = {};
+    var textOption = {};
+    if(read == "true") {
+        readOption = {"readBy" : "userPlaceholder"};
+    } else if(read == "false") {
+        readOption = {"readBy" : {"$nin" : "userPlaceholder"}};
+    }
+    if(category.length > 0) {
+        categoryOption = {"category" : category};
+    }
+    if(text.length > 0) {
+        textOption = {
+            "$or":
+                [
+                    {"subject": regExText},
+                    {"text": regExText}
+                ]
+        };
+    }
+    Snyt.find(
+        {"$and" :
+            [
+                categoryOption,
+                textOption,
+                {"created" : {
+                    "$gte" : dateFrom,
+                    "$lte" : dateTo
+                }},
+                readOption
+            ]
+        }).exec(function(err, doc) {
+        if(err) {
+            throw err;
+        } else {
+            res.json(doc);
+        }
+    });
+});
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
 app.listen(1337);
