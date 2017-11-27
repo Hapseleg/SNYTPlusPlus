@@ -1,2 +1,18 @@
 extends layout.pug
 block body
+    if(authenticated)
+        //INDSÆT KODE DER VISER SNYT OVERSIGT HER
+        h1 INDSÆT OVERSIGT TING HER TEMP TEMP TEMP
+    else
+        //Hvis man ikke er logget ind kommer det her:
+        h1 SNYT++
+        form(action="/", method="POST")
+            fieldset
+                p
+                    label Email
+                    input(name="user[email]", type="text", value=signupEmail)
+                p
+                    label Password
+                    input(name="user[password]", type="password")
+                p
+                    button(type="submit" class="btn btn-primary") Log Ind
