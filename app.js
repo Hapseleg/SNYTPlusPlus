@@ -20,11 +20,11 @@ mongoClient.connect(mongoUrl, function (err, db) {
     }
     console.log("Connected successfully to server");
     app.Snyt = db.collection('snyts');
-    db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
+    // db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
         if (err) {
             throw err
         }
-    });
+    // });
 });
 
 mongoose.connect(mongoUrl, {

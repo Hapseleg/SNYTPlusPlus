@@ -1,5 +1,5 @@
 var sejeId;
-var subject = 'subj';
+var subject = 'us10test';
 var category = 'catg';
 var text = 'txt';
 var user = 'bruger';
@@ -11,8 +11,7 @@ const app = require('../app');
 var Snyt = require('../models/Snyt.model');
 var request = require('request');
 
-function s (){
-    console.log('s');
+function s (done){
     var nysnyt = new Snyt();
     nysnyt.subject = subject;
     nysnyt.category = category;
@@ -21,11 +20,12 @@ function s (){
     nysnyt.save(function (err, snyt) {
         if(err){
             console.log('nope');
-            res.send('Du er blevet snyt(: ' + err);
+            return done(err);
         } else{
             sejeId = snyt._id;
             console.log(sejeId);
             console.log('yup');
+            done();
         }
     });
 }
@@ -38,11 +38,19 @@ function s (){
 // });
 
 
-sejeId = '5a180df55577e6257445dab2';
+//sejeId = '5a180df55577e6257445dab2';
 
 describe('/GET/snyt/:id snyt', function () {
     var snyt1;
     before(function (done) {
+        Snyt.remove({subject: 'us10test'});
+        console.log('snyt removed');
+        s(done);
+        // done();
+    });
+    before(function (done) {
+        // Snyt.remove({subject: 'us10test'});
+        console.log('rimelig sejt: ' + sejeId);
         request('http://localhost:1337/snyt/'+sejeId, function (err, res, body) {
             // console.log(sejeId);
             if(body){
