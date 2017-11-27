@@ -8,7 +8,6 @@ var express = require('express'),
     Snyt = require('./models/Snyt.model');
 
 var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
-mongoose.Promise = global.Promise;
 
 var app = express();
 
@@ -21,7 +20,7 @@ mongoClient.connect(mongoUrl, function (err, db) {
     }
     console.log("Connected successfully to server");
     app.Snyt = db.collection('snyts');
-    db.ensureIndex('created', function (err) {
+    db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
         if (err) {
             throw err
         }
@@ -42,19 +41,20 @@ app.get('/',function (req,res) {
 });
 
 app.get('/opretsnyt', function (req,res) {
-    res.render('createSnyt');
+    // var today = Date();
+    // console.log("TODAY");
+    // console.log(today);
+    res.render('createSnyt');//, {date: today});
 });
 
 app.post('/opretsnyt',function (req,res) {
-    var newSnyt = new SNYT();
+    var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
     newSnyt.text = req.body.snyt.text;
     newSnyt.user = req.body.snyt.user;
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
-
-
 
     newSnyt.save(function (err, snyt) {
        if(err){
@@ -144,4 +144,4 @@ app.post('/search', function(req, res) {
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
 app.listen(1337);
 
-// module.exports = mongoClient;
+module.exports = mongoClient;
