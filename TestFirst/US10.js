@@ -1,4 +1,3 @@
-var url = 'localhost:1337';
 var sejeId;
 var subject = 'subj';
 var category = 'catg';
