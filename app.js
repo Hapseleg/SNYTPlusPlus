@@ -21,11 +21,11 @@ mongoClient.connect(mongoUrl, function (err, db) {
     }
     console.log("Connected successfully to server");
     app.Snyt = db.collection('snyts');
-    db.ensureIndex('created', function (err) {
-        if (err) {
-            throw err
-        }
-    });
+    // db.ensureIndex({'created' : 1}, function (err) {
+    //     if (err) {
+    //         throw err
+    //     }
+    // });
 });
 
 mongoose.connect(mongoUrl, {
