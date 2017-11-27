@@ -70,22 +70,30 @@ app.post('/search', function(req, res) {
     var regExText = new RegExp(".*" + text + ".*", "i");
     console.log(req.body);
     var readOption = {};
+    var categoryOption = {};
+    var textOption = {};
     if(read == "true") {
         readOption = {"readBy" : "userPlaceholder"};
     } else if(read == "false") {
         readOption = {"readBy" : {"$nin" : "userPlaceholder"}};
     }
+    if(category.length > 0) {
+        categoryOption = {"category" : category};
+    }
+    if(text.length > 0) {
+        textOption = {
+            "$or":
+                [
+                    {"subject": regExText},
+                    {"text": regExText}
+                ]
+        };
+    }
     Snyt.find(
         {"$and" :
             [
-                {"category" : category},
-                {
-                    "$or":
-                        [
-                            {"subject": regExText},
-                            {"text": regExText}
-                        ]
-                },
+                categoryOption,
+                textOption,
                 {"created" : {
                     "$gte" : dateFrom,
                     "$lte" : dateTo
