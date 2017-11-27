@@ -7,43 +7,49 @@ describe('Search', function() {
     var multiple = [];
     var all = [];
 
-    // First test
-    request("localhost:1337/search/nomatch", function(error, response, body) {
-        if(body) {
-            nomatch = JSON.parse(body);
-        }
+    var requestString = "http://localhost:1337/search";
+
+    before(function(done) {
+        request(requestString + "/nomatch", function(error, response, body) {
+            if(body) {
+                nomatch = JSON.parse(body);
+            }
+            request(requestString + "/Doh", function(error, response, body) {
+                if(body) {
+                    onematch = JSON.parse(body);
+                }
+                request(requestString + "/test", function(error, response, body) {
+                    if(body) {
+                        multiple = JSON.parse(body);
+                    }
+                    request(requestString, function(error, response, body) {
+                        if(body) {
+                            all = JSON.parse(body);
+                        }
+                        done();
+                    });
+                });
+            });
+        });
     });
+
+    // First test
     it('Search should return no object', function() {
-        assert.equal(nomatch, []);
+        assert.deepEqual(nomatch, []);
     });
 
     // Second test
-    request("localhost:1337/search/Doh", function(error, response, body) {
-        if(body) {
-            onematch = JSON.parse(body);
-        }
-    });
-    it('Search should return no object', function() {
+    it('Search should return 1 object', function() {
         assert.equal(onematch.length, 1);
     });
 
     // Third test
-    request("localhost:1337/search/test", function(error, response, body) {
-        if(body) {
-            multiple = JSON.parse(body);
-        }
-    });
-    it('Search should return no object', function() {
+    it('Search should return 4 objects', function() {
         assert.equal(multiple.length, 4);
     });
 
     // Fourth test
-    request("localhost:1337/search", function(error, response, body) {
-        if(body) {
-            all = JSON.parse(body);
-        }
-    });
-    it('Search should return no object', function() {
+    it('Search should return 5 objects', function() {
         assert.equal(all.length, 5);
     });
 });
