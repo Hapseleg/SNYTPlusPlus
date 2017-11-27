@@ -62,7 +62,43 @@ app.get('/search/:text', function(req, res) {
 });
 
 app.post('/search', function(req, res) {
-
+    var text = req.body.text;
+    var dateFrom = new Date(req.body.dateFrom).toISOString();
+    var dateTo = new Date(req.body.dateTo).toISOString();
+    var read = req.body.read;
+    var category = req.body.category;
+    var regExText = new RegExp(".*" + text + ".*", "i");
+    console.log(req.body);
+    var readOption = {};
+    if(read == "true") {
+        readOption = {"readBy" : "userPlaceholder"};
+    } else if(read == "false") {
+        readOption = {"readBy" : {"$nin" : "userPlaceholder"}};
+    }
+    Snyt.find(
+        {"$and" :
+            [
+                {"category" : category},
+                {
+                    "$or":
+                        [
+                            {"subject": regExText},
+                            {"text": regExText}
+                        ]
+                },
+                {"created" : {
+                    "$gte" : dateFrom,
+                    "$lte" : dateTo
+                }},
+                readOption
+            ]
+        }).exec(function(err, doc) {
+        if(err) {
+            throw err;
+        } else {
+            res.json(doc);
+        }
+    });
 });
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
