@@ -11,6 +11,7 @@ var express = require('express'),
     User = require('./models/User.model');
 
 var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
+mongoose.Promise = global.Promise;
 
 var app = express();
 
@@ -71,6 +72,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan('tiny'));
 
 app.set('view engine', 'pug');
+
+app.use(function(req, res, next) {
+    if(req.session.adminLoggedIn) {
+        res.locals.authenticatedAdmin = true;
+    } else {
+        res.locals.authenticatedAdmin = false;
+    }
+    next();
+});
 
 app.get('/',function (req,res) {
     res.render('index');
@@ -195,6 +205,42 @@ app.post('/search', function(req, res) {
             res.json(doc);
         }
     });
+});
+
+// Get admin side (login side hvis man ikke er authenticated)
+app.get('/admin', function(req, res) {
+    res.render('admin');
+});
+
+// Opret ny bruger i systemet
+app.post('/admin', function(req, res) {
+
+});
+
+// Rediger en bruger
+app.put('/admin', function(req, res) {
+
+});
+
+// Slet en bruger
+app.delete('/admin', function(req, res) {
+
+});
+
+// Login som admin
+app.post('/admin/login', function(req, res) {
+    var adminUsername = "administrator";
+    var adminPassword = "pokemon";
+
+    if(req.body.adminUsername == adminUsername && req.body.adminPassword == adminPassword) {
+        // Sæt req.session.adminLoggedIn til true
+    }
+    res.redirect('/admin');
+});
+
+app.post('/admin/logout', function(req, res) {
+    // Sæt req.session.adminLoggedIn til false
+    res.render('admin');
 });
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
