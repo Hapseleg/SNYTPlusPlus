@@ -46,7 +46,6 @@ describe('/GET/snyt/:id snyt', function () {
         Snyt.remove({subject: 'us10test'});
         console.log('snyt removed');
         s(done);
-        // done();
     });
     before(function (done) {
         // Snyt.remove({subject: 'us10test'});
