@@ -1,59 +1,60 @@
 extends layout.pug
 block body
-    form(action="/opretsnyt", method="POST")
-        div(class="row")
-            div(class="col-2")
-                fieldset
-                ul(type="none")
-                    li
-                        button(type="button" class="btn btn-primary") Gå tilbage
-                    //li
-                    //    button(type="button" class="btn btn-primary") Opdater SNYT
-                    //li
-                    //    button(type="button" class="btn btn-primary") Rediger SNYT
-                    //li
-                    //    input(type="checkbox")
-                    //    label Læse Kvitteret
-                    li
-                    label e-Dok
-                        input(type="text" name="snyt[edok]")
-                        //a(href="#" name="snyt[edok]") e-Dok
-                    li
-                        label Dato
-                        input(type="datetime-local" name="snyt[created]")
-                        //div(class="form-group")
-                        //    div(class="input-group date" id="datetimepicker1")
-                        //        input(type="text" class="form-control")
-                        //        span(class="input-group-addon")
-                        //            span(class="glyphicon glyphicon-calendar")
-                        //    script.
-                        //        $(function(){$('#datetimepicker1').datetimepicker();});
+    if(authenticated)
+        form(action="/opretsnyt", method="POST")
+            div(class="row")
+                div(class="col-2")
+                    fieldset
+                    ul(type="none")
+                        li
+                            button(type="button" class="btn btn-primary") Gå tilbage
+                        //li
+                        //    button(type="button" class="btn btn-primary") Opdater SNYT
+                        //li
+                        //    button(type="button" class="btn btn-primary") Rediger SNYT
+                        //li
+                        //    input(type="checkbox")
+                        //    label Læse Kvitteret
+                        li
+                        label e-Dok
+                            input(type="text" name="snyt[edok]")
+                            //a(href="#" name="snyt[edok]") e-Dok
+                        li
+                            label Dato
+                            input(type="datetime-local" name="snyt[created]")
+                            //div(class="form-group")
+                            //    div(class="input-group date" id="datetimepicker1")
+                            //        input(type="text" class="form-control")
+                            //        span(class="input-group-addon")
+                            //            span(class="glyphicon glyphicon-calendar")
+                            //    script.
+                            //        $(function(){$('#datetimepicker1').datetimepicker();});
 
-                    li
-                        label Initialer
-                        input(type="text" name="snyt[user]")
-                    li
-                        label Kategori
-                        //input(type="text" name="snyt[category]")
-                        select(name="snyt[category]")
-                            option(value="ac") AC
-                            option(value="logistik") Logistik
-                            option(value="tovholder") Tovholder
-                            option(value="hygiejne") Hygiejne
-                            option(value="levering") Levering
-                            option(value="reklamation") Reklamation
-                            option(value="it") IT
-                            option(value="klinisk") Klinisk Forsøg
-                            option(value="produktion") Produktion
-
-
-                    li
-                        button(type="submit" class="btn btn-primary") Gem
+                        li
+                            label Initialer
+                            input(type="text" name="snyt[user]")
+                        li
+                            label Kategori
+                            //input(type="text" name="snyt[category]")
+                            select(name="snyt[category]")
+                                option(value="ac") AC
+                                option(value="logistik") Logistik
+                                option(value="tovholder") Tovholder
+                                option(value="hygiejne") Hygiejne
+                                option(value="levering") Levering
+                                option(value="reklamation") Reklamation
+                                option(value="it") IT
+                                option(value="klinisk") Klinisk Forsøg
+                                option(value="produktion") Produktion
 
 
-            div(class="col-10")
-                ul(type="none")
-                    li
-                        input(type="text" name="snyt[subject]")
-                    li
-                        textarea(name="snyt[text]" rows="20" cols="150")
+                        li
+                            button(type="submit" class="btn btn-primary") Gem
+
+
+                div(class="col-10")
+                    ul(type="none")
+                        li
+                            input(type="text" name="snyt[subject]")
+                        li
+                            textarea(name="snyt[text]" rows="20" cols="150")

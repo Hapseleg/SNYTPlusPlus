@@ -2,10 +2,13 @@ var express = require('express'),
     mongoClient = require('mongodb').MongoClient,
     ObjectId = require('mongodb').ObjectId,
     bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
+    cookieSession = require('cookie-session'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     rp = require('request-promise'),
-    Snyt = require('./models/Snyt.model');
+    Snyt = require('./models/Snyt.model'),
+    User = require('./models/User.model');
 
 var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
 
@@ -20,6 +23,7 @@ mongoClient.connect(mongoUrl, function (err, db) {
     }
     console.log("Connected successfully to server");
     app.Snyt = db.collection('snyts');
+    app.users = db.collection('Users');
     db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
         if (err) {
             throw err
@@ -30,6 +34,38 @@ mongoClient.connect(mongoUrl, function (err, db) {
 mongoose.connect(mongoUrl, {
     useMongoClient: true
 });
+app.use(bodyParser.urlencoded({extended:true}));
+app.use(cookieParser());
+app.use(morgan('tiny'));
+app.use(cookieSession({
+    name:'session',
+    keys:['hejKaj123'],//hash seed
+    maxAge: 8*60*60*1000 //(1 time * 60 minutter * 60 sekunder * 1000 mili) = 8 timer i mili sek
+}));
+
+app.use(function(req,res,next){
+    if(req.session.loggedIn){
+        res.locals.authenticated = true;
+        app.users.findOne({"_id": new ObjectId(req.session.loggedIn)},
+            function (err,doc) {
+                if(err){
+                    return next(err)
+                }
+                else{
+                    res.locals.me = doc;
+                    next()
+                }
+            })
+    }
+    else{
+        res.locals.authenticated = false;
+        next();
+    }
+
+    //TODO KUN TIL TEST HVIS DU IKKE HAR ET LOGIN!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // res.locals.authenticated = true;
+    // next();
+});
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(morgan('tiny'));
@@ -38,6 +74,26 @@ app.set('view engine', 'pug');
 
 app.get('/',function (req,res) {
     res.render('index');
+});
+
+app.post('/',function (req,res) {
+    app.users.findOne({email: req.body.user.email, password: req.body.user.password}, function (err,doc) {
+        if(err){
+            return next(err)
+        }
+        else if(!doc){
+            return res.send('<p>User not found</p>');
+        }
+        else{
+            req.session.loggedIn = doc._id;
+            res.redirect('/');
+        }
+    });
+});
+
+app.get('/logout',function (req,res) {
+    req.session.loggedIn = null;
+    res.redirect('/');
 });
 
 app.get('/opretsnyt', function (req,res) {
