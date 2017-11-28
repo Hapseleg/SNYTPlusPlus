@@ -35,13 +35,28 @@ function s (done){
 
 function findsnyt(body) {
     var edk = /edok]" href="(.[^"]+)/.exec(body)[0];
-    var subj = /subject]" value="(.[^"]+)/.exec(body)[0];
+    var sub = /subject]" value="(.[^"]+)/.exec(body)[0];
     var cat = /category]" value="(.[^"]+)/.exec(body)[0];
     var use = /user]" value="(.[^"]+)/.exec(body)[0];
     var cre = /created]" value="(.[^"]+)/.exec(body)[0];
-    var tx = /text]"(.[^<]+)/.exec(body)[0];
+    var tex = /text]">(.[^<]+)/.exec(body)[0];
+    edk=edk.substring(13);
+    sub=sub.substring(17);
+    cat=cat.substring(18);
+    use=use.substring(14);
+    cre=cre.substring(17);
+    tex=tex.substring(7);
+    console.log(edk+sub+cat+use+cre+tex);
 
-    var snyt2
+    var snyt2 = {
+        edok: edk,
+        subject: sub,
+        category: cat,
+        text: tex,
+        user: use,
+        created: cre
+    };
+    return snyt2;
 }
 
 // Snyt.find({_id: req.params.id}).exec().then(function(snyt) {
@@ -67,14 +82,14 @@ describe('/GET/snyt/:id snyt', function () {
             console.log();
             if(body){
                 console.log('hej ' + body);
-                snyt1 = {
+                snyt1 =  findsnyt(body);
                     // edok: body'[edok]" href="xxx"',
                     // subject: body'[subject]" value="xxx"',
                     // category: body'[category]" value="xxx"',
                     // text: body'[text]">xxx<',
                     // user: body'[user]" value="xxx"',
                     // created: body'[created]" value="xxx"'
-                    };
+
             }
             console.log('MIN SNYT ' +snyt1);
             done();
