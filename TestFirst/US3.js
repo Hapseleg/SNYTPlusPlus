@@ -6,11 +6,17 @@ Test at den bliver gemt i db når man trykker opret
 v2 billeder, login
  */
 
-var assert = require('assert');
-const equals = require('chai').equals;
-var expect = require('chai').expect;
+// var assert = require('assert');
+// const equals = require('chai').equals;
+// var expect = require('chai').expect;
+var assert = require('chai').assert;
+var chai = require('chai');
+var chaiHttp = require('chai-http');
+chai.use(chaiHttp);
 
-const app = require('../app');
+var app = "http://localhost:1337";
+
+// const app = require('../app');
 var SNYT = require('../models/Snyt.model');
 
 describe('Create SNYT test', function () {
@@ -49,7 +55,6 @@ describe('Create SNYT test', function () {
             done();
         });
     });
-
 });
 
 
