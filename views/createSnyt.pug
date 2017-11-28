@@ -7,7 +7,8 @@ block body
                     fieldset
                     ul(type="none")
                         li
-                            button(type="button" class="btn btn-primary") Gå tilbage
+                            a(href="/")
+                                button(type="button" class="btn btn-primary") Gå tilbage
                         //li
                         //    button(type="button" class="btn btn-primary") Opdater SNYT
                         //li
@@ -21,7 +22,8 @@ block body
                             //a(href="#" name="snyt[edok]") e-Dok
                         li
                             label Dato
-                            input(type="datetime-local" name="snyt[created]")
+                            input#advDateFrom(type="date" name="snyt[created]")
+                            //input(type="datetime-local" name="snyt[created]")
                             //div(class="form-group")
                             //    div(class="input-group date" id="datetimepicker1")
                             //        input(type="text" class="form-control")
