@@ -132,8 +132,8 @@ app.post('/opretsnyt',function (req,res) {
 });
 
 app.get('/snyt/:id', function (req, res) {
-    Snyt.find({_id: req.params.id}).exec().then(function(snyt) {
-        res.json(snyt);
+    Snyt.find({_id: req.params.id}).exec().then(function(doc) {
+        res.render('showSnyt', {snyt: doc});
     }).catch(function (err) {
         console.log('du er blevet snyt hehe (: '+err);
     });

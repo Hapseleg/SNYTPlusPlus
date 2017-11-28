@@ -1,8 +1,9 @@
 var sejeId;
 var subject = 'us10test';
 var category = 'catg';
-var text = 'txt';
+var text = 'mad mad mad';
 var user = 'bruger';
+var eDok = 'eodk';
 
 
 
@@ -10,6 +11,7 @@ const assert = require('chai').assert;
 const app = require('../app');
 var Snyt = require('../models/Snyt.model');
 var request = require('request');
+var bodyParser = require('body-parser');
 
 function s (done){
     var nysnyt = new Snyt();
@@ -17,6 +19,7 @@ function s (done){
     nysnyt.category = category;
     nysnyt.text = text;
     nysnyt.user = user;
+    nysnyt.edok = eDok;
     nysnyt.save(function (err, snyt) {
         if(err){
             console.log('nope');
@@ -30,6 +33,16 @@ function s (done){
     });
 }
 
+function findsnyt(body) {
+    var edk = /edok]" href="(.[^"]+)/.exec(body)[0];
+    var subj = /subject]" value="(.[^"]+)/.exec(body)[0];
+    var cat = /category]" value="(.[^"]+)/.exec(body)[0];
+    var use = /user]" value="(.[^"]+)/.exec(body)[0];
+    var cre = /created]" value="(.[^"]+)/.exec(body)[0];
+    var tx = /text]"(.[^<]+)/.exec(body)[0];
+
+    var snyt2
+}
 
 // Snyt.find({_id: req.params.id}).exec().then(function(snyt) {
 //     res.json(snyt);
@@ -51,12 +64,19 @@ describe('/GET/snyt/:id snyt', function () {
         // Snyt.remove({subject: 'us10test'});
         console.log('rimelig sejt: ' + sejeId);
         request('http://localhost:1337/snyt/'+sejeId, function (err, res, body) {
-            // console.log(sejeId);
+            console.log();
             if(body){
-                // console.log('hej ' + body);
-                snyt1 = JSON.parse(body)[0];
+                console.log('hej ' + body);
+                snyt1 = {
+                    // edok: body'[edok]" href="xxx"',
+                    // subject: body'[subject]" value="xxx"',
+                    // category: body'[category]" value="xxx"',
+                    // text: body'[text]">xxx<',
+                    // user: body'[user]" value="xxx"',
+                    // created: body'[created]" value="xxx"'
+                    };
             }
-            console.log(snyt1);
+            console.log('MIN SNYT ' +snyt1);
             done();
         });
     });
@@ -68,5 +88,6 @@ describe('/GET/snyt/:id snyt', function () {
         assert.equal(snyt1.category, category);
         assert.equal(snyt1.text, text);
         assert.equal(snyt1.user, user);
+        assert.equal(snyt1.edok, eDok);
     })
 });
