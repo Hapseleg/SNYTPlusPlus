@@ -83,7 +83,18 @@ app.use(function(req, res, next) {
 });
 
 app.get('/',function (req,res) {
-    res.render('index');
+    Snyt.find({}).exec().then(function(snyt) {
+        //TODO tilføj så man kan se hvilke man har læse kvitteret
+        //TODO sorter efter dato? Eller burde db ikke være sorteret efter det?
+        res.render('index',{allSnyt:snyt});
+    }).catch(function (err) {
+        console.log(err);
+    });
+
+
+
+
+    // res.render('index');
 });
 
 app.post('/',function (req,res) {
