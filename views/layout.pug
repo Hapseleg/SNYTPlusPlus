@@ -23,9 +23,9 @@ html
                         li(class="nav-item"): a(class="nav-link" href="/opretsnyt") Opret SNYT
                         li(class="nav-item"): a(class="nav-link" href="#") Læsekvittering oversigt
 
-                    form(class="form-inline my-2 my-lg-0")
-                        input(class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search")
-                        button(class="btn btn-outline-success my-2 my-sm-0" type="submit") Search
+
+                    input(class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="regularSearchText")
+                    button(class="btn btn-outline-success my-2 my-sm-0" onClick="regularSearch();") Search
 
                     form(class="form-inline my-2 my-lg-0")
                         button(type="button" class="btn btn-primary" data-toggle="modal" data-target="#advancedSearch") Flere søgemuligheder
@@ -92,7 +92,7 @@ html
                             br
 
                     div(class="modal-footer")
-                        button(type="button" class="btn btn-primary") Søg
+                        button(type="button" class="btn btn-primary" onClick="advancedSearch();") Søg
                         button(type="button" class="btn btn-secondary" data-dismiss="modal") Luk
 
 
