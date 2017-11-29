@@ -1,0 +1,31 @@
+extends layout.pug
+block body
+    if(authenticated)
+        form(action="/opretsnyt", method="POST")
+            div(class="row")
+                div(class="col-2")
+                    fieldset
+                    ul(type="none")
+                        li
+                            a(href="/")
+                                button(type="button" class="btn btn-primary") Gå tilbage
+                        li
+                        a(name="snyt[edok]" href=snyt[0].edok) e-Dok
+                        li
+                        label Dato
+                            input(type="text" name="snyt[created]" value=snyt[0].created disabled=true)
+                        li
+                        label Initialer
+                            input(type="text" name="snyt[user]", value=snyt[0].user disabled = true)
+                        li
+                        label Kategori
+                            input(type="text" name="snyt[category]" value=snyt[0].category disabled = true)
+
+
+                div(class="col-10")
+                    ul(type="none")
+                        li
+                            input(type="text" name="snyt[subject]" value=snyt[0].subject disabled = true)
+                        li
+                            textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=snyt[0].text
+

@@ -1,8 +1,22 @@
 extends layout.pug
 block body
     if(authenticated)
-        //INDSÆT KODE DER VISER SNYT OVERSIGT HER
-        h1 INDSÆT OVERSIGT TING HER TEMP TEMP TEMP
+        div(class="container")
+            table(class="table")
+                thead
+                    tr
+                        th Emne
+                        th Dato
+                        th Initialer
+                        th Læst
+                tbody
+                    each snyt in allSnyt
+                        tr
+                            td
+                                a(href="/snyt/"+snyt._id) #{snyt.subject}
+                            td= snyt.created
+                            td= snyt.user
+                            td //TODO
     else
         //Hvis man ikke er logget ind kommer det her:
         h1 SNYT++

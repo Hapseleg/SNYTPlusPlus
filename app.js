@@ -41,7 +41,7 @@ app.use(morgan('tiny'));
 app.use(cookieSession({
     name:'session',
     keys:['hejKaj123'],//hash seed
-    maxAge: 8*60*60*1000 //(1 time * 60 minutter * 60 sekunder * 1000 mili) = 8 timer i mili sek
+    maxAge: 8*60*60*1000 //(8 time * 60 minutter * 60 sekunder * 1000 mili) = 8 timer i mili sek
 }));
 
 app.use(function(req,res,next){
@@ -83,7 +83,18 @@ app.use(function(req, res, next) {
 });
 
 app.get('/',function (req,res) {
-    res.render('index');
+    Snyt.find({}).exec().then(function(snyt) {
+        //TODO tilføj så man kan se hvilke man har læse kvitteret
+        //TODO sorter efter dato? Eller burde db ikke være sorteret efter det?
+        res.render('index',{allSnyt:snyt});
+    }).catch(function (err) {
+        console.log(err);
+    });
+
+
+
+
+    // res.render('index');
 });
 
 app.post('/',function (req,res) {
@@ -96,6 +107,7 @@ app.post('/',function (req,res) {
         }
         else{
             req.session.loggedIn = doc._id;
+            // res.send(doc);
             res.redirect('/');
         }
     });
@@ -127,15 +139,14 @@ app.post('/opretsnyt',function (req,res) {
            res.send('Error:'+err.toString());
        }
     });
-
     res.redirect('/');
 });
 
 app.get('/snyt/:id', function (req, res) {
-    Snyt.find({_id: req.params.id}).exec().then(function(snyt) {
-        res.json(snyt);
+    Snyt.find({_id: req.params.id}).exec().then(function(doc) {
+        res.render('showSnyt', {snyt: doc});
     }).catch(function (err) {
-        console.log('du er blevet snyt hehe (: '+err);
+        console.log('du er blevet snyt hehe (: \n'+err);
     });
 });
 app.get('/search', function(req, res) {
