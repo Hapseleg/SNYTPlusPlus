@@ -1,0 +1,21 @@
+if(authenticatedAdmin)
+    //INDSÆT KODE DER VISER SNYT OVERSIGT HER
+    h1 INDSÆT OVERSIGT TING HER TEMP TEMP TEMP
+    if !errors
+        each user in allUsers
+            p #{user.first} #{user.last}
+    else
+        p FEJL!
+else
+    //Hvis man ikke er logget ind kommer det her:
+    h1 SNYT++
+    form(action="/admin/login", method="POST")
+        fieldset
+            p
+                label Email
+                input(name="adminUsername", type="text")
+            p
+                label Password
+                input(name="adminPassword", type="password")
+            p
+                button(type="submit" class="btn btn-primary") Log Ind

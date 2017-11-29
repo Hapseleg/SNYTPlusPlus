@@ -24,7 +24,7 @@ mongoClient.connect(mongoUrl, function (err, db) {
     }
     console.log("Connected successfully to server");
     app.Snyt = db.collection('snyts');
-    app.users = db.collection('Users');
+    app.users = db.collection('users');
     // db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
         if (err) {
             throw err
@@ -162,11 +162,12 @@ app.get('/search/:text', function(req, res) {
 app.post('/search', function(req, res) {
     var text = req.body.text;
     var dateFrom = new Date(req.body.dateFrom).toISOString();
+    console.log("Raw: " + req.body.dateFrom);
+    console.log("ISOString: " + dateFrom);
     var dateTo = new Date(req.body.dateTo).toISOString();
     var read = req.body.read;
     var category = req.body.category;
     var regExText = new RegExp(".*" + text + ".*", "i");
-    console.log(req.body);
     var readOption = {};
     var categoryOption = {};
     var textOption = {};
@@ -209,22 +210,71 @@ app.post('/search', function(req, res) {
 
 // Get admin side (login side hvis man ikke er authenticated)
 app.get('/admin', function(req, res) {
-    res.render('admin');
+    var allUsers = null;
+    var errors = null;
+    User.find({}).exec(function(err, doc) {
+        if(doc) {
+            allUsers = doc;
+        } else {
+            error = "Der skete en fejl, prøv at genindlæse siden"
+        }
+        if(err) {
+            error = err;
+        }
+        res.render('admin', {allUsers : allUsers, errors : errors});
+    });
 });
 
 // Opret ny bruger i systemet
 app.post('/admin', function(req, res) {
+    console.log("POST til /admin");
+    var newUser = new User();
+    newUser.first = req.body.user.first;
+    newUser.last = req.body.user.last;
+    newUser.initials = req.body.user.initials;
+    newUser.email = req.body.user.email;
+    newUser.password = req.body.user.password;
 
+    newUser.save(function (err, user) {
+        if(err){
+            res.send('Error:'+err.toString());
+        }
+    });
+
+    res.redirect('/admin');
 });
 
 // Rediger en bruger
 app.put('/admin', function(req, res) {
-
+    console.log("PUT");
+    User.findById(ObjectId(req.body.id), function(err, u) {
+        if(err) {
+            res.send('Error:'+err.toString());
+        }
+        console.log(u);
+        if(!u) {
+            throw new Error("Ingen bruger");
+        }
+        u.firstName = req.body.firstName;
+        u.lastName = req.body.lastName;
+        u.password = req.body.password;
+        u.email = req.body.email;
+        u.initials = req.body.initials;
+        u.save(function(err) {
+            if(err) {
+                throw err;
+            }
+            res.redirect("/admin");
+        });
+    });
 });
 
 // Slet en bruger
 app.delete('/admin', function(req, res) {
-
+    console.log("DELETE");
+    console.log(req.body.id);
+    User.find({"_id" : ObjectId(req.body.id)}).remove().exec();
+    res.render('admin');
 });
 
 // Login som admin
@@ -233,17 +283,40 @@ app.post('/admin/login', function(req, res) {
     var adminPassword = "pokemon";
 
     if(req.body.adminUsername == adminUsername && req.body.adminPassword == adminPassword) {
-        // Sæt req.session.adminLoggedIn til true
+        req.session.adminLoggedIn = "thisIsAdmin";
     }
     res.redirect('/admin');
 });
 
 app.post('/admin/logout', function(req, res) {
-    // Sæt req.session.adminLoggedIn til false
-    res.render('admin');
+    console.log("POST til /admin/logout");
+    req.session.adminLoggedIn = null;
+    res.redirect('/admin');
+});
+
+// Hjælpefunktion til at få ID på en bruger med email og password i POST
+app.post('/admin/user', function(req, res) {
+    console.log("POST til /admin/user");
+    var email = req.body.email;
+    var password = req.body.password;
+    console.log(email);
+    console.log(password);
+
+    User.findOne({"email" : email, "password" : password}).exec(function(err, doc) {
+        console.log("Doc: " + doc);
+        console.log("Error:" + err);
+        if(!doc) {
+            throw new Error("Ingen bruger");
+        }
+        if(err) {
+            throw err;
+        }
+        console.log("Sidste linje i POST til /admin/user");
+        res.json(doc._id);
+    });
 });
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
 app.listen(1337);
 
-module.exports = mongoClient;
+// module.exports = mongoClient;
