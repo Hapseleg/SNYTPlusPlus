@@ -14,7 +14,7 @@ block body
                         tr
                             td
                                 a(href="/snyt/"+snyt._id) #{snyt.subject}
-                            td= snyt.created
+                            td= snyt.created.toLocaleDateString()
                             td= snyt.user
                             td //TODO
     else

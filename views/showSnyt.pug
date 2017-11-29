@@ -13,13 +13,17 @@ block body
                         a(name="snyt[edok]" href=snyt[0].edok) e-Dok
                         li
                         label Dato
-                            input(type="text" name="snyt[created]" value=snyt[0].created disabled=true)
+                            input(type="text" name="snyt[created]" value=snyt[0].created.toLocaleDateString() disabled=true)
                         li
                         label Initialer
                             input(type="text" name="snyt[user]", value=snyt[0].user disabled = true)
                         li
                         label Kategori
                             input(type="text" name="snyt[category]" value=snyt[0].category disabled = true)
+                        li
+                            a(href="/editsnyt/" + snyt[0]._id)
+                                button(type="button" class="btn btn-primary") Rediger SNYT
+
                         li
                             button(type="submit" class="btn btn-primary") Kvitter
 
