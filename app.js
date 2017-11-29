@@ -1,6 +1,4 @@
 var express = require('express'),
-    mongoClient = require('mongodb').MongoClient,
-    ObjectId = require('mongodb').ObjectId,
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     cookieSession = require('cookie-session'),
@@ -11,30 +9,41 @@ var express = require('express'),
     User = require('./models/User.model');
 
 var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
-mongoose.Promise = global.Promise;
 
 var app = express();
 
 app.use(express.static('public'));
+
+//***************************************************************************
+// MongoDB / Mongoose setup!
+//***************************************************************************
+
 mongoose.Promise = global.Promise;
 
-mongoClient.connect(mongoUrl, function (err, db) {
-    if(err) {
-        throw err;
-    }
-    console.log("Connected successfully to server");
-    app.Snyt = db.collection('snyts');
-    app.users = db.collection('users');
-    // db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
-        if (err) {
-            throw err
-        }
-    // });
-});
-
+// Connect to the mongoDB
 mongoose.connect(mongoUrl, {
     useMongoClient: true
 });
+
+// Connection message
+mongoose.connection.on('connected', function() {
+    console.log('Connected succesfully to mongodb server: ' + mongoUrl);
+});
+
+// Error message
+mongoose.connection.on('error', function (err) {
+    console.log('Mongoose connection error: ' + err);
+});
+
+// Disconnect message
+mongoose.connection.on('disconnected', function() {
+    console.log('Mongoose connection disconnected');
+});
+
+//***************************************************************************
+// MIDDLEWARE
+//***************************************************************************
+
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cookieParser());
 app.use(cookieSession({
@@ -46,7 +55,7 @@ app.use(cookieSession({
 app.use(function(req,res,next){
     if(req.session.loggedIn){
         res.locals.authenticated = true;
-        app.users.findOne({"_id": new ObjectId(req.session.loggedIn)},
+        User.findOne({"_id": mongoose.Types.ObjectId(req.session.loggedIn)},
             function (err,doc) {
                 if(err){
                     return next(err)
@@ -78,6 +87,11 @@ app.use(function(req, res, next) {
     next();
 });
 
+//***************************************************************************
+// Routes
+//***************************************************************************
+
+// Frontpage get route
 app.get('/',function (req,res) {
     Snyt.find({}).exec().then(function(snyt) {
         //TODO tilføj så man kan se hvilke man har læse kvitteret
@@ -89,8 +103,9 @@ app.get('/',function (req,res) {
     // res.render('index');
 });
 
+// Login post route
 app.post('/',function (req,res) {
-    app.users.findOne({email: req.body.user.email, password: req.body.user.password}, function (err,doc) {
+    User.findOne({email: req.body.user.email, password: req.body.user.password}, function (err,doc) {
         if(err){
             return next(err)
         }
@@ -105,15 +120,18 @@ app.post('/',function (req,res) {
     });
 });
 
+// Logout route
 app.get('/logout',function (req,res) {
     req.session.loggedIn = null;
     res.redirect('/');
 });
 
+// Render create snyt screen
 app.get('/opretsnyt', function (req,res) {
     res.render('createSnyt');
 });
 
+// Create new snyt route
 app.post('/opretsnyt',function (req,res) {
     var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
@@ -132,26 +150,32 @@ app.post('/opretsnyt',function (req,res) {
     });
     res.redirect('/');
 });
-app.post('/snyt/:id',function (req,res) {
-    console.log(req.session.loggedIn);
-    Snyt.find({_id: req.params.id}).exec().then(function(doc) {
-        /*
-         * find eget user _id.
-         * set user til læsekvitter = true
-         */
-    }).catch(function (err) {
-        console.log('du er blevet snyt hehe (: \n'+err);
-    });
-    res.redirect('/');
-});
 
-app.get('/snyt/:id', function (req, res) {
-    Snyt.find({_id: req.params.id}).exec().then(function(doc) {
-        res.render('showSnyt', {snyt: doc});
-    }).catch(function (err) {
-        console.log('du er blevet snyt hehe (: \n'+err);
+// SNYT Read, mark as læsekvitteret, update and delete routes
+    // Read SNYT
+    app.get('/snyt/:id', function (req, res) {
+        Snyt.find({_id: req.params.id}).exec().then(function(doc) {
+            res.render('showSnyt', {snyt: doc});
+        }).catch(function (err) {
+            console.log('du er blevet snyt hehe (: \n'+err);
+            res.send('Error:' + err.toString());
+        });
     });
-});
+    // Mark a SNYT as læsekvitteret
+    app.post('/snyt/:id', function (req,res) {
+        Snyt.find({_id: req.params.id}).exec().then(function(doc) {
+            /*
+             * find eget user _id.
+             * set user til læsekvitter = true
+             */
+        }).catch(function (err) {
+            console.log('du er blevet snyt hehe (: \n'+err);
+            res.send('Error:' + err.toString());
+        });
+        res.redirect('/');
+    });
+    //TODO update and delete
+
 app.get('/search', function(req, res) {
     Snyt.find({}).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
@@ -282,7 +306,7 @@ app.post('/admin', function(req, res) {
 
 // Rediger en bruger
 app.put('/admin', function(req, res) {
-    User.findById(ObjectId(req.body.id), function(err, u) {
+    User.findById(mongoose.Types.ObjectId(req.body.id), function(err, u) {
         if(err) {
             res.send('Error:'+err.toString());
         }
@@ -306,7 +330,7 @@ app.put('/admin', function(req, res) {
 
 // Slet en bruger
 app.delete('/admin', function(req, res) {
-    User.find({"_id" : ObjectId(req.body.id)}).remove().exec();
+    User.find({"_id" : mongoose.Types.ObjectId(req.body.id)}).remove().exec();
     res.render('admin');
 });
 
@@ -369,8 +393,21 @@ app.post('/editSnyt',function (req, res) {
 });
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
-if(!module.parent){
-    app.listen(1337);
-}
+//if (!module.parent) {
+//    app.listen(1337);
+//    console.log("Listening on port 1337...");
+//}
 
-module.exports = app;
+// We need to use the returned value from listen() to be able to close it again.
+var server = app.listen(1337);
+
+// Used for tests to shut down the server again.
+var shutdown = function() {
+    console.log("Server shutting down...");
+    mongoose.connection.close();
+    server.close();
+};
+module.exports = {
+    app: app,
+    shutdown: shutdown
+};
