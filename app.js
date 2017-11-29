@@ -24,7 +24,7 @@ mongoClient.connect(mongoUrl, function (err, db) {
     }
     console.log("Connected successfully to server");
     app.Snyt = db.collection('snyts');
-    app.users = db.collection('Users');
+    app.users = db.collection('users');
     // db.ensureIndex('subject', 'category', 'text', 'user','created','edok', function (err) {
         if (err) {
             throw err
@@ -133,6 +133,8 @@ app.post('/opretsnyt',function (req,res) {
     newSnyt.user = req.body.snyt.user;
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
+
+    console.log(req.body.snyt.created);
 
     newSnyt.save(function (err, snyt) {
        if(err){
@@ -252,6 +254,58 @@ app.post('/admin/login', function(req, res) {
 app.post('/admin/logout', function(req, res) {
     // Sæt req.session.adminLoggedIn til false
     res.render('admin');
+});
+
+app.get('/editSnyt/:id',function (req, res) {
+    Snyt.find({_id: req.params.id}).exec(function (err,doc) {
+        res.render('editSnyt',{snyt:doc});
+    });
+});
+app.post('/editSnyt',function (req, res) {
+    var newSnyt = new Snyt();
+    newSnyt.subject = req.body.snyt.subject;
+    newSnyt.category = req.body.snyt.category;
+    newSnyt.text = req.body.snyt.text;
+    newSnyt.user = req.body.snyt.user;
+    newSnyt.created = req.body.snyt.created;
+    newSnyt.edok = req.body.snyt.edok;
+    newSnyt._id = req.body.snyt._id;
+
+    // Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok},function (err, doc) {
+    //     if(err){
+    //         console.log("redigerings error"+err);
+    //     }
+    //
+    //     console.log(typeof doc);
+    //     console.log(doc);
+    //     res.render('showSnyt', {snyt: doc});
+    //     // console.log(newSnyt);
+    //     // res.render('showSnyt', {snyt: doc});
+    // });
+
+    // Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {returnNewDocument:true}).exec().then(function (doc) {
+    //     res.render('showSnyt', {snyt: doc});
+    // }).catch(function (err) {
+    //     console.log(err);
+    // });
+
+    Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
+        console.log(doc);
+        var docarray = [];
+        docarray.push(doc);
+
+        res.render('showSnyt',{snyt:docarray});
+    }).catch(function (err) {
+        console.log(err);
+    });
+
+    // Snyt.find({_id: req.params.id}).exec().then(function(doc) {
+    //     res.render('showSnyt', {snyt: doc});
+    // }).catch(function (err) {
+    //     console.log('du er blevet snyt hehe (: \n'+err);
+    // });
+
+
 });
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
