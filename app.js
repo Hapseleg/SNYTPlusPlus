@@ -68,9 +68,6 @@ app.use(function(req,res,next){
     // next();
 });
 
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(morgan('tiny'));
-
 app.set('view engine', 'pug');
 
 app.use(function(req, res, next) {
@@ -164,7 +161,7 @@ app.get('/snyt/:id', function (req, res) {
     });
 });
 app.get('/search', function(req, res) {
-    Snyt.find({}).exec(function(err, doc) {
+    Snyt.find({}).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
             throw err;
         } else {
@@ -175,7 +172,7 @@ app.get('/search', function(req, res) {
 
 app.get('/search/:text', function(req, res) {
     var reg = new RegExp(".*" + req.params.text + ".*", "i");
-    Snyt.find({"$or":[{"subject": reg}, {"text": reg}]}).exec(function(err, doc) {
+    Snyt.find({"$or":[{"subject": reg}, {"text": reg}]}).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
             throw err;
         } else {
@@ -186,10 +183,13 @@ app.get('/search/:text', function(req, res) {
 
 app.post('/search', function(req, res) {
     var text = req.body.text;
-    var dateFrom = new Date(req.body.dateFrom).toISOString();
-    console.log("Raw: " + req.body.dateFrom);
-    console.log("ISOString: " + dateFrom);
-    var dateTo = new Date(req.body.dateTo).toISOString();
+    var dateFrom = new Date(req.body.dateFrom);
+    var dateTo = new Date(req.body.dateTo);
+    dateTo.setHours(24);
+    dateTo.setMinutes(59);
+    dateTo.setSeconds(59);
+    dateFrom = dateFrom.toISOString();
+    dateTo = dateTo.toISOString();
     var read = req.body.read;
     var category = req.body.category;
     var regExText = new RegExp(".*" + text + ".*", "i");
@@ -224,7 +224,7 @@ app.post('/search', function(req, res) {
                 }},
                 readOption
             ]
-        }).exec(function(err, doc) {
+        }).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
             throw err;
         } else {
@@ -252,7 +252,26 @@ app.get('/admin', function(req, res) {
 
 // Opret ny bruger i systemet
 app.post('/admin', function(req, res) {
-    console.log("POST til /admin");
+    var errors = [];
+    User.find({"email" : req.body.user.email}).exec(function(err, doc) {
+        if(err) {
+            errors.push(err);
+        }
+        if(doc) {
+            errors.push("Bruger med denne email eksisterer allerede");
+        }
+    });
+    User.find({"initials" : req.body.user.initials}).exec(function(err, doc) {
+        if(err) {
+            errors.push(err);
+        }
+        if(doc) {
+            errors.push("Bruger med disse initialer eksisterer allerede");
+        }
+    });
+    if(errors.length > 0) {
+        res.json(errors);
+    }
     var newUser = new User();
     newUser.first = req.body.user.first;
     newUser.last = req.body.user.last;
@@ -271,7 +290,6 @@ app.post('/admin', function(req, res) {
 
 // Rediger en bruger
 app.put('/admin', function(req, res) {
-    console.log("PUT");
     User.findById(ObjectId(req.body.id), function(err, u) {
         if(err) {
             res.send('Error:'+err.toString());
@@ -296,8 +314,6 @@ app.put('/admin', function(req, res) {
 
 // Slet en bruger
 app.delete('/admin', function(req, res) {
-    console.log("DELETE");
-    console.log(req.body.id);
     User.find({"_id" : ObjectId(req.body.id)}).remove().exec();
     res.render('admin');
 });
@@ -313,30 +329,23 @@ app.post('/admin/login', function(req, res) {
     res.redirect('/admin');
 });
 
-app.post('/admin/logout', function(req, res) {
-    console.log("POST til /admin/logout");
+app.get('/admin/logout', function(req, res) {
     req.session.adminLoggedIn = null;
     res.redirect('/admin');
 });
 
 // Hjælpefunktion til at få ID på en bruger med email og password i POST
 app.post('/admin/user', function(req, res) {
-    console.log("POST til /admin/user");
     var email = req.body.email;
     var password = req.body.password;
-    console.log(email);
-    console.log(password);
 
     User.findOne({"email" : email, "password" : password}).exec(function(err, doc) {
-        console.log("Doc: " + doc);
-        console.log("Error:" + err);
         if(!doc) {
             throw new Error("Ingen bruger");
         }
         if(err) {
             throw err;
         }
-        console.log("Sidste linje i POST til /admin/user");
         res.json(doc._id);
     });
 });

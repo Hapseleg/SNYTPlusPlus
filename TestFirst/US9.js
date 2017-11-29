@@ -2,9 +2,10 @@ var assert = require('chai').assert;
 var chai = require('chai');
 var chaiHttp = require('chai-http');
 chai.use(chaiHttp);
-var request = require('request');
 
 var app = "http://localhost:1337";
+
+var agent = chai.request.agent(app);
 
 describe("CRUD bruger", function() {
 
@@ -87,6 +88,20 @@ describe("CRUD bruger", function() {
             })
             .end(function (err, res) {
                 assert.isNull(err);
+                done();
+            });
+    });
+
+    it("Should be logged in", function(done) {
+        agent
+            .post('/admin/login')
+            .type("form")
+            .send({
+                adminUsername : "administrator",
+                adminPassword : "pokemon"
+            })
+            .end(function (err, res) {
+                assert.isAbove(res.request.cookies.length, 1);
                 done();
             });
     });
