@@ -11,6 +11,8 @@ $(document).ready(function() {
     var monthBefore = ("0" + (before.getMonth() + 1)).slice(-2);
     var dateBefore = before.getFullYear() + "-" + (monthBefore) + "-" + (dayBefore);
     $("#advDateFrom").val(dateBefore);
+
+    advancedSearch();
 });
 
 function regularSearch() {
@@ -23,8 +25,14 @@ function regularSearch() {
         {
             method : "GET",
             success : function(documents) {
+                var table = $("#snytOversigt");
+                table.empty();
                 for(var i in documents) {
-                    console.log(documents[i].subject);
+                    var subject = documents[i].subject;
+                    var date = documents[i].created.toString().substring(0, 10);
+                    var initials = documents[i].user;
+                    var read = "//TODO";
+                    table.append("<tr><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td>");
                 }
             }
         }
@@ -45,7 +53,16 @@ function advancedSearch() {
             dateTo : dateTo,
             read : read
         }
-    ).done(function(response) {
-        console.log(response);
+    ).done(function(documents) {
+        console.log(documents);
+        var table = $("#snytOversigt");
+        table.html("");
+        for(var i in documents) {
+            var subject = documents[i].subject;
+            var date = documents[i].created.toString().substring(0, 10);
+            var initials = documents[i].user;
+            var read = "//TODO";
+            table.append("<tr><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td>");
+        }
     });
 }
