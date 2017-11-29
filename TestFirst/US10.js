@@ -8,12 +8,17 @@ var eDok = 'eodk';
 
 
 const assert = require('chai').assert;
-const app = require('../app');
+var app = require('../app');
 var Snyt = require('../models/Snyt.model');
-var request = require('request');
-var bodyParser = require('body-parser');
+//global.Promise = require('q');
+//var app = "http://localhost:1337";
 
-function s (done){
+var chai = require('chai'),
+    chaiHttp = require('chai-http');
+
+chai.use(chaiHttp);
+
+function createTestSnyt (done){
     var nysnyt = new Snyt();
     nysnyt.subject = subject;
     nysnyt.category = category;
@@ -34,6 +39,7 @@ function s (done){
 }
 
 function findsnyt(body) {
+    console.log(body);
     var edk = /edok]" href="(.[^"]+)/.exec(body)[0];
     var sub = /subject]" value="(.[^"]+)/.exec(body)[0];
     var cat = /category]" value="(.[^"]+)/.exec(body)[0];
@@ -56,6 +62,7 @@ function findsnyt(body) {
         user: use,
         created: cre
     };
+    console.log(snyt2)
     return snyt2;
 }
 
@@ -67,35 +74,64 @@ function findsnyt(body) {
 
 
 //sejeId = '5a180df55577e6257445dab2';
+var snyt1;
 
 describe('/GET/snyt/:id snyt', function () {
-    var snyt1;
+    before(function (done) {
+        app=app.listen(1337);
+        done();
+    });
     before(function (done) {
         Snyt.remove({subject: 'us10test'});
         console.log('snyt removed');
-        s(done);
+        createTestSnyt(done);
     });
     before(function (done) {
-        // Snyt.remove({subject: 'us10test'});
-        console.log('rimelig sejt: ' + sejeId);
-        request('http://localhost:1337/snyt/'+sejeId, function (err, res, body) {
-            console.log();
-            if(body){
-                console.log('hej ' + body);
-                snyt1 =  findsnyt(body);
-                    // edok: body'[edok]" href="xxx"',
-                    // subject: body'[subject]" value="xxx"',
-                    // category: body'[category]" value="xxx"',
-                    // text: body'[text]">xxx<',
-                    // user: body'[user]" value="xxx"',
-                    // created: body'[created]" value="xxx"'
+        var agent = chai.request.agent(app);
+        agent.post('/').type('form').send( {user: { email: 'test@test.dk', password: '123' }}).then(function (res) {
+            //console.log(res);
+            //expect(res).to.have.cookie('sessionid');
+                // The `agent` now has the sessionid cookie saved, and will send it
+                // back to the server in the next request:
+            agent.get('/snyt/'+sejeId)
+                    .end(function (e,res) {
+                        //console.log(res);
+                        if(res.text){
+                            console.log('hej ' + res.text);
+                            snyt1 =  findsnyt(res.text);
+                            // edok: body'[edok]" href="xxx"',
+                            // subject: body'[subject]" value="xxx"',
+                            // category: body'[category]" value="xxx"',
+                            // text: body'[text]">xxx<',
+                            // user: body'[user]" value="xxx"',
+                            // created: body'[created]" value="xxx"'
 
-            }
-            console.log('MIN SNYT ' +snyt1);
-            done();
-        });
+                        }
+                        console.log('MIN SNYT ' + snyt1);
+                        done();
+                    });
+            });
     });
-    it('snyt er ens', function () {
+    // before(function (done) {
+    //     // Snyt.remove({subject: 'us10test'});
+    //     console.log('rimelig sejt: ' + sejeId);
+    //     request('http://localhost:1337/snyt/'+sejeId, function (err, res, body) {
+        //     console.log();
+        //     if(body){
+        //         console.log('hej ' + body);
+        //         snyt1 =  findsnyt(body);
+        //             // edok: body'[edok]" href="xxx"',
+        //             // subject: body'[subject]" value="xxx"',
+        //             // category: body'[category]" value="xxx"',
+        //             // text: body'[text]">xxx<',
+        //             // user: body'[user]" value="xxx"',
+        //             // created: body'[created]" value="xxx"'
+        //
+        //     }
+        //     console.log('MIN SNYT ' +snyt1);
+        //     done();
+        // });
+    it('snyt er ens', function (done) {
         console.log(subject);
         console.log(snyt1.subject);
 
@@ -104,5 +140,11 @@ describe('/GET/snyt/:id snyt', function () {
         assert.equal(snyt1.text, text);
         assert.equal(snyt1.user, user);
         assert.equal(snyt1.edok, eDok);
+        done();
+    });
+    after(function (done) {
+        console.log('lort');
+        app.close();
+        done();
     })
 });

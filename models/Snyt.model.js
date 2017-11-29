@@ -11,6 +11,7 @@ var SnytSchema = new Schema({
     user: String,
     created: {type: Date, default: Date.now},
     edok : String
+    // notReadBy: []
 });
 
 module.exports = mongoose.model('Snyts', SnytSchema);

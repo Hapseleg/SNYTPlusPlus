@@ -1,7 +1,7 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/opretsnyt", method="POST")
+        form(action="/snyt/:id", method="POST")
             div(class="row")
                 div(class="col-2")
                     fieldset
@@ -20,7 +20,8 @@ block body
                         li
                         label Kategori
                             input(type="text" name="snyt[category]" value=snyt[0].category disabled = true)
-
+                        li
+                            button(type="submit" class="btn btn-primary") Kvitter
 
                 div(class="col-10")
                     ul(type="none")

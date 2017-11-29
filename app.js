@@ -141,6 +141,18 @@ app.post('/opretsnyt',function (req,res) {
     });
     res.redirect('/');
 });
+app.post('/snyt/:id',function (req,res) {
+    console.log(req.session.loggedIn);
+    Snyt.find({_id: req.params.id}).exec().then(function(doc) {
+        /*
+         * find eget user _id.
+         * set user til læsekvitter = true
+         */
+    }).catch(function (err) {
+        console.log('du er blevet snyt hehe (: \n'+err);
+    });
+    res.redirect('/');
+});
 
 app.get('/snyt/:id', function (req, res) {
     Snyt.find({_id: req.params.id}).exec().then(function(doc) {
@@ -328,6 +340,9 @@ app.post('/admin/user', function(req, res) {
 });
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
-app.listen(1337);
+if(!module.parent){
+    app.listen(1337);
+}
 
 // module.exports = mongoClient;
+module.exports = app;
