@@ -37,7 +37,6 @@ mongoose.connect(mongoUrl, {
 });
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(cookieParser());
-app.use(morgan('tiny'));
 app.use(cookieSession({
     name:'session',
     keys:['hejKaj123'],//hash seed
@@ -87,10 +86,6 @@ app.get('/',function (req,res) {
     }).catch(function (err) {
         console.log(err);
     });
-
-
-
-
     // res.render('index');
 });
 
@@ -116,10 +111,7 @@ app.get('/logout',function (req,res) {
 });
 
 app.get('/opretsnyt', function (req,res) {
-    // var today = Date();
-    // console.log("TODAY");
-    // console.log(today);
-    res.render('createSnyt');//, {date: today});
+    res.render('createSnyt');
 });
 
 app.post('/opretsnyt',function (req,res) {
@@ -365,24 +357,6 @@ app.post('/editSnyt',function (req, res) {
     newSnyt.edok = req.body.snyt.edok;
     newSnyt._id = req.body.snyt._id;
 
-    // Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok},function (err, doc) {
-    //     if(err){
-    //         console.log("redigerings error"+err);
-    //     }
-    //
-    //     console.log(typeof doc);
-    //     console.log(doc);
-    //     res.render('showSnyt', {snyt: doc});
-    //     // console.log(newSnyt);
-    //     // res.render('showSnyt', {snyt: doc});
-    // });
-
-    // Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {returnNewDocument:true}).exec().then(function (doc) {
-    //     res.render('showSnyt', {snyt: doc});
-    // }).catch(function (err) {
-    //     console.log(err);
-    // });
-
     Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
         console.log(doc);
         var docarray = [];
@@ -392,14 +366,6 @@ app.post('/editSnyt',function (req, res) {
     }).catch(function (err) {
         console.log(err);
     });
-
-    // Snyt.find({_id: req.params.id}).exec().then(function(doc) {
-    //     res.render('showSnyt', {snyt: doc});
-    // }).catch(function (err) {
-    //     console.log('du er blevet snyt hehe (: \n'+err);
-    // });
-
-
 });
 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
@@ -407,5 +373,4 @@ if(!module.parent){
     app.listen(1337);
 }
 
-// module.exports = mongoClient;
 module.exports = app;
