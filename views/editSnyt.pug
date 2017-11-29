@@ -14,7 +14,7 @@ block body
                                 input(type="text" name="snyt[edok]" value=snyt[0].edok)
                         li
                         label Dato
-                            input#advDateFrom(type="date" name="snyt[created]" value=value=snyt[0].created)
+                            input(type="date" name="snyt[created]" value=value=snyt[0].created.toLocaleDateString())
                             //input(type="text" name="snyt[created]" value=snyt[0].created)
                         li
                         label Initialer
