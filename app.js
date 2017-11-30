@@ -10,6 +10,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     rp = require('request-promise'),
     config = require('config'),
+    subSnyt = require('./models/Subsnyt.model'),
     Snyt = require('./models/Snyt.model'),
     User = require('./models/User.model');
 
@@ -201,7 +202,34 @@ app.post('/opretsnyt',function (req,res) {
     });
     res.redirect('/');
 });
+app.get('/updateSnyt/:id', function (req,res) {
+    console.log(req.params.id);
+    res.render('updateSnyt', {snytid: req.params.id});
+});
+app.post('/updateSnyt/:id',function (req,res) {
+    var newsubsnyt = new subSnyt();
+    newsubsnyt.text = req.body.subsnyt.text;
+    newsubsnyt.user = req.body.subsnyt.user;
+    newsubsnyt.created = req.body.subsnyt.created;
+    console.log(newsubsnyt);
+    console.log(req.params.id);
+    console.log(req.body.subsnyt);
 
+    newsubsnyt.save(function (err, subsnyt) {
+        if(err){
+            res.send('Error:'+err.toString());
+        }
+        console.log('her er lorten');
+        console.log(subsnyt);
+        console.log(req.params.id);
+        Snyt.findOneAndUpdate({_id: req.params.id},{$push: {idSubSnyts: subsnyt._id }}
+
+            );
+
+
+    });
+    res.redirect('/');
+});
 /*
  * SNYT Read and mark as læsekvitteret routes
  */

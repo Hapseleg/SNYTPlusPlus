@@ -3,7 +3,6 @@
 
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var User = require('./User.model');
 
 // var s = function() {
 //     User.find().exec().then(function (user) {
@@ -27,6 +26,9 @@ var SnytSchema = new Schema({
     text: String,
     user: String,
     created: {type: Date, default: Date.now},
+    edok : String,
+    idSubSnyts: []
+    // notReadBy: []
     edok : String,
     readBy: {type: Array}
 });
