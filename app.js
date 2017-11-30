@@ -9,7 +9,8 @@ var express = require('express'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     rp = require('request-promise'),
-    config = require('config');
+    config = require('config'),
+    subSnyt = require('./models/Subsnyt.model'),
     Snyt = require('./models/Snyt.model'),
     User = require('./models/User.model');
 
@@ -176,6 +177,16 @@ app.post('/opretsnyt',function (req,res) {
     newSnyt.user = req.body.snyt.user;
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
+    // var AddAllUsersToNewSnyt = function() {
+    //     User.find().exec().then(function (user) {
+    //         var a = [];
+    //         for (var j in user) {
+    //             console.log(j + '_:_ '+user[j]);
+    //             a.push(user[j]._id);
+    //         }
+    //         newSnyt.notReadBy = a;
+    //     });
+    // }();
 
     console.log(req.body.snyt.created);
 
@@ -183,36 +194,78 @@ app.post('/opretsnyt',function (req,res) {
        if(err){
            res.send('Error:'+err.toString());
        }
+       // console.log(snyt.notReadBy);
     });
     res.redirect('/');
 });
+app.get('/updateSnyt/:id', function (req,res) {
+    console.log(req.params.id);
+    res.render('updateSnyt', {snytid: req.params.id});
+});
+app.post('/updateSnyt/:id',function (req,res) {
+    var newsubsnyt = new subSnyt();
+    newsubsnyt.text = req.body.subsnyt.text;
+    newsubsnyt.user = req.body.subsnyt.user;
+    newsubsnyt.created = req.body.subsnyt.created;
+    console.log(newsubsnyt);
+    console.log(req.params.id);
+    console.log(req.body.subsnyt);
 
+    newsubsnyt.save(function (err, subsnyt) {
+        if(err){
+            res.send('Error:'+err.toString());
+        }
+        console.log('her er lorten');
+        console.log(subsnyt);
+        console.log(req.params.id);
+        Snyt.findOneAndUpdate({_id: req.params.id},{$push: {idSubSnyts: subsnyt._id }}
+
+            );
+
+
+    });
+    res.redirect('/');
+});
 /*
  * SNYT Read and mark as læsekvitteret routes
  */
 app.route('/snyt/:id')
+    //TODO
     // GET - Read SNYT
     .get(function (req, res) {
-        Snyt.find({_id: req.params.id}).exec().then(function(doc) {
-            res.render('showSnyt', {snyt: doc});
+        let userID = req.session.loggedIn;
+        let notUserRead = true;
+        Snyt.findById(req.params.id).exec().then(function(doc) {
+            if(doc.readBy.includes(userID)){
+                notUserRead = false;
+            }
+            res.render('showSnyt', {snyt: doc, userHasNotRead: notUserRead});
         }).catch(function (err) {
             console.log('du er blevet snyt hehe (: \n'+err);
             res.send('Error:' + err.toString());
         });
-    })
-    // POST -  Mark a SNYT as læsekvitteret -> redirect to /
-    .post(function (req,res) {
-        Snyt.find({_id: req.params.id}).exec().then(function(doc) {
-            /*
-             * find eget user _id.
-             * set user til læsekvitter = true
-             */
-        }).catch(function (err) {
-            console.log('du er blevet snyt hehe (: \n'+err);
-            res.send('Error:' + err.toString());
-        });
-        res.redirect('/');
     });
+
+
+// POST -  Mark a SNYT as læsekvitteret -> redirect to /
+app.post('/snyt/:id',function (req,res) {
+    let userID = req.session.loggedIn;
+    console.log("her er lorten");
+    console.log(req.params.id);
+    Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {readBy: userID}})
+        // .exec()
+        .catch(function (err) {
+            console.log('du er blevet snyt hehe (: \n'+err);
+            res.send('\n \n Error:' + err.toString());
+        });
+    Snyt.findOne({_id: req.params.id}).exec().then(function (doc) {
+        console.log(doc.readBy);
+    }).catch(function (err) {
+        console.log('\n mere snyt \n' + err);
+    });
+
+    res.redirect('/');
+});
 
 /*
  *
@@ -385,6 +438,15 @@ app.post('/admin', function(req, res) {
     newUser.email = req.body.user.email;
     newUser.password = req.body.user.password;
 
+    // var AddNewUserToAllSnyts = function() {
+    //     Snyt.find().exec().then(function (snyt) {
+    //         for (var n in snyt) {
+    //             console.log(n + '_:_ '+snyt[n]);
+    //             snyt[n].notReadBy.push(newUser[n]._id);
+    //         }
+    //     });
+    // }();
+
     newUser.save(function (err, user) {
         if(err){
             res.send('Error:'+err.toString());
@@ -432,6 +494,16 @@ app.put('/admin', function(req, res) {
  * Slet en bruger
  */
 app.delete('/admin', function(req, res) {
+
+    // var removeOldUserFromAllSnyts = function() {
+    //     Snyt.find().exec().then(function (snyt) {
+    //         for (var nn in snyt) {
+    //             console.log(nn + '_:_ '+snyt[nn]);
+    //             snyt[nn].notReadBy.remove(_id));
+    //         }
+    //     });
+    // }();
+
     User.find({"_id" : mongoose.Types.ObjectId(req.body.id)}).remove().exec();
     res.render('admin');
 });
