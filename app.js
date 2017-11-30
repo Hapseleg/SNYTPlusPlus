@@ -9,6 +9,7 @@ var express = require('express'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     rp = require('request-promise'),
+    config = require('config');
     Snyt = require('./models/Snyt.model'),
     User = require('./models/User.model');
 
@@ -25,7 +26,9 @@ app.set('view engine', 'pug');
 //---------------------------------------
 // MongoDB / Mongoose setup
 
-var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
+// config.DBHost has mongoUrl information.
+// if a test database is necessary, we need to change the DBHost in /config/test.json && make sure our tests sets process.env.NODE_ENV = 'test'
+var mongoUrl = config.DBHost; 
 mongoose.Promise = global.Promise;
 
 // Connect to the mongoDB
@@ -53,7 +56,11 @@ mongoose.connection.on('disconnected', function() {
 //***************************************************************************
 
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(morgan('tiny'));
+
+// If it's a test don't show morgan logging.
+if (config.util.getEnv('NODE_ENV') !== 'test') {
+    app.use(morgan('tiny'));
+}
 
 //---------------------------------
 // Cookie setup
@@ -116,7 +123,6 @@ app.get('/',function (req,res) {
     }).catch(function (err) {
         console.log(err);
     });
-    // res.render('index');
 });
 
 /*
@@ -186,10 +192,10 @@ app.post('/opretsnyt',function (req,res) {
 });
 
 /*
- * SNYT Read, mark as læsekvitteret, update and delete routes
+ * SNYT Read and mark as læsekvitteret routes
  */
 app.route('/snyt/:id')
-    // Read SNYT
+    // GET - Read SNYT
     .get(function (req, res) {
         Snyt.find({_id: req.params.id}).exec().then(function(doc) {
             res.render('showSnyt', {snyt: doc});
@@ -198,7 +204,7 @@ app.route('/snyt/:id')
             res.send('Error:' + err.toString());
         });
     })
-    // Mark a SNYT as læsekvitteret
+    // POST -  Mark a SNYT as læsekvitteret -> redirect to /
     .post(function (req,res) {
         Snyt.find({_id: req.params.id}).exec().then(function(doc) {
             /*
