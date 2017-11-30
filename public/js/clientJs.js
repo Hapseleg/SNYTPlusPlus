@@ -32,11 +32,15 @@ function regularSearch() {
                     var date = documents[i].created.toString().substring(0, 10);
                     var initials = documents[i].user;
                     var read = "//TODO";
-                    table.append("<tr><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td>");
+                    table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
                 }
+                $(".clickableRow").click(function() {
+                    window.location = "/snyt/" + $(this).data("href");
+                });
             }
         }
     );
+
 }
 
 function advancedSearch() {
@@ -62,7 +66,10 @@ function advancedSearch() {
             var date = documents[i].created.toString().substring(0, 10);
             var initials = documents[i].user;
             var read = "//TODO";
-            table.append("<tr><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td>");
+            table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
         }
+        $(".clickableRow").click(function() {
+            window.location = "/snyt/" + $(this).data("href");
+        });
     });
 }

@@ -54,8 +54,6 @@ describe("CRUD bruger", function() {
             .end(function(err, res) {
                 if(!err) {
                     userId = res.body;
-                    console.log("INGEN FEJL!!!!!");
-                    console.log(userId);
                     chai.request(app)
                         .put('/admin')
                         .type("form")
@@ -68,8 +66,6 @@ describe("CRUD bruger", function() {
                             "initials" : "JB"
                         })
                         .end(function (err, res) {
-                            console.log("I END!!!");
-                            console.log(res);
                             assert.isNull(err);
                             done();
                         });

@@ -17,6 +17,8 @@ var express = require('express'),
 // Set up application
 //***************************************************************************
 
+//TODO Refactor error handling, så det sker på samme måde i alle ruter
+
 var app = express();
 app.use(express.static('public'));
 
@@ -116,13 +118,7 @@ app.use(function(req, res, next) {
  * Frontpage get route
 */
 app.get('/',function (req,res) {
-    Snyt.find({}).exec().then(function(snyt) {
-        //TODO tilføj så man kan se hvilke man har læse kvitteret
-        //TODO sorter efter dato? Eller burde db ikke være sorteret efter det?
-        res.render('index',{allSnyt:snyt});
-    }).catch(function (err) {
-        console.log(err);
-    });
+    res.render('index');
 });
 
 /*
@@ -255,7 +251,7 @@ app.get('/editSnyt/:id',function (req, res) {
 // Search routes
 
 /*
- * 
+ * Alle snyt
  */
 app.get('/search', function(req, res) {
     Snyt.find({}).sort({"created" : -1}).exec(function(err, doc) {
@@ -268,7 +264,7 @@ app.get('/search', function(req, res) {
 });
 
 /*
- * 
+ * Almindelig søgning
  */
 app.get('/search/:text', function(req, res) {
     var reg = new RegExp(".*" + req.params.text + ".*", "i");
@@ -282,7 +278,7 @@ app.get('/search/:text', function(req, res) {
 });
 
 /*
- *
+ * Avanceret søgning
  */
 app.post('/search', function(req, res) {
     var text = req.body.text;
@@ -402,13 +398,18 @@ app.post('/admin', function(req, res) {
  * Rediger en bruger
  */
 app.put('/admin', function(req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     User.findById(mongoose.Types.ObjectId(req.body.id), function(err, u) {
         if(err) {
-            res.send('Error:'+err.toString());
+            returnJson.errors.push(err);
         }
         console.log(u);
         if(!u) {
-            throw new Error("Ingen bruger");
+            returnJson.errors.push(new Error("Ingen bruger"));
         }
         u.firstName = req.body.firstName;
         u.lastName = req.body.lastName;
@@ -417,9 +418,12 @@ app.put('/admin', function(req, res) {
         u.initials = req.body.initials;
         u.save(function(err) {
             if(err) {
-                throw err;
+                returnJson.errors.push(err);
+                returnJson.message = "Something went wrong";
+            } else {
+                returnJson.message = "success";
             }
-            res.redirect("/admin");
+            res.redirect("/admin", returnJson);
         });
     });
 });

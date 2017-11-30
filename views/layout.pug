@@ -6,6 +6,10 @@ html
         rel="stylesheet"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
         )
+        link(
+        rel="stylesheet"
+        href="css/mainCss.css"
+        )
         script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
         script(src='js/clientJs.js')
         script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous")
@@ -31,8 +35,7 @@ html
                     ul(class="navbar-nav")
                         //li(class="nav-item"): a(class="nav-link" href="#") Flere søgemuligheder
                         li(class="nav-item dropdown")
-                            a(class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") BRUGERNAVN
-                            //TODO hvordan fanden får vi smidt brugernavn ind i layout?
+                            a(class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false") #{me.email}
                             div(class="dropdown-menu" aria-labelledby="navbarDropdown")
                                 a(class="dropdown-item" href="#") link1
                                 a(class="dropdown-item" href="/logout") Log ud
@@ -92,4 +95,12 @@ html
                     div(class="modal-footer")
                         button(type="button" class="btn btn-primary" onClick="advancedSearch();") Søg
                         button(type="button" class="btn btn-secondary" data-dismiss="modal") Luk
+        if errors
+            if errors.length > 0
+                div#errorDiv
+                    p Der skete følgende fejl
+                    ul#errorList
+                        each err in errors
+                            li= err
+
         block body
