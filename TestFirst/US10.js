@@ -33,8 +33,6 @@ function createTestSnyt (done){
             sejeId = snyt._id;
             console.log(sejeId);
             console.log('yup');
-            console.log(nysnyt.notReadBy);
-
             done();
         }
     });
@@ -81,11 +79,11 @@ var snyt1;
 describe('/GET/snyt/:id snyt', function () {
     before(function (done) {
         app=app.listen(1337);
-        Snyt.remove({subject: 'us10test'});
-        console.log('snyt removed');
         done();
     });
     before(function (done) {
+        Snyt.remove({subject: 'us10test'});
+        console.log('snyt removed');
         createTestSnyt(done);
     });
     before(function (done) {
@@ -136,6 +134,7 @@ describe('/GET/snyt/:id snyt', function () {
     it('snyt er ens', function (done) {
         console.log(subject);
         console.log(snyt1.subject);
+
         assert.equal(snyt1.subject, subject);
         assert.equal(snyt1.category, category);
         assert.equal(snyt1.text, text);

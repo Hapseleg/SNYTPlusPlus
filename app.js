@@ -180,16 +180,6 @@ app.post('/opretsnyt',function (req,res) {
     newSnyt.user = req.body.snyt.user;
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
-    var AddAllUsersToNewSnyt = function() {
-        User.find().exec().then(function (user) {
-            var a = [];
-            for (var j in user) {
-                console.log(j + '_:_ '+user[j]);
-                a.push(user[j]._id);
-            }
-            newSnyt.notReadBy = a;
-        });
-    }();
 
     console.log(req.body.snyt.created);
 
@@ -197,7 +187,6 @@ app.post('/opretsnyt',function (req,res) {
        if(err){
            res.send('Error:'+err.toString());
        }
-       console.log(snyt.notReadBy);
     });
     res.redirect('/');
 });
@@ -399,15 +388,6 @@ app.post('/admin', function(req, res) {
     newUser.initials = req.body.user.initials;
     newUser.email = req.body.user.email;
     newUser.password = req.body.user.password;
-
-    var AddNewUserToAllSnyts = function() {
-        Snyt.find().exec().then(function (snyt) {
-            for (var n in snyt) {
-                console.log(n + '_:_ '+snyt[n]);
-                snyt[n].notReadBy.push(newUser[n]._id);
-            }
-        });
-    }();
 
     newUser.save(function (err, user) {
         if(err){
