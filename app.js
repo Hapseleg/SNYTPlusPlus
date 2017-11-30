@@ -1,3 +1,7 @@
+//***************************************************************************
+// Module dependencies
+//***************************************************************************
+
 var express = require('express'),
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
@@ -8,16 +12,20 @@ var express = require('express'),
     Snyt = require('./models/Snyt.model'),
     User = require('./models/User.model');
 
-var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
+//***************************************************************************
+// Set up application
+//***************************************************************************
 
 var app = express();
-
 app.use(express.static('public'));
 
-//***************************************************************************
-// MongoDB / Mongoose setup!
-//***************************************************************************
+// View options
+app.set('view engine', 'pug');
 
+//---------------------------------------
+// MongoDB / Mongoose setup
+
+var mongoUrl = 'mongodb://snytfix:snytfix@ds115166.mlab.com:15166/snytplusplus';
 mongoose.Promise = global.Promise;
 
 // Connect to the mongoDB
@@ -45,13 +53,20 @@ mongoose.connection.on('disconnected', function() {
 //***************************************************************************
 
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(morgan('tiny'));
+
+//---------------------------------
+// Cookie setup
+
 app.use(cookieParser());
 app.use(cookieSession({
     name:'session',
     keys:['hejKaj123'],//hash seed
     maxAge: 8*60*60*1000 //(8 time * 60 minutter * 60 sekunder * 1000 mili) = 8 timer i mili sek
 }));
+//---------------------------------
 
+// Are we authenticated?
 app.use(function(req,res,next){
     if(req.session.loggedIn){
         res.locals.authenticated = true;
@@ -76,8 +91,7 @@ app.use(function(req,res,next){
     // next();
 });
 
-app.set('view engine', 'pug');
-
+// Are we authenticated as an admin?
 app.use(function(req, res, next) {
     if(req.session.adminLoggedIn) {
         res.locals.authenticatedAdmin = true;
@@ -91,7 +105,9 @@ app.use(function(req, res, next) {
 // Routes
 //***************************************************************************
 
-// Frontpage get route
+/* 
+ * Frontpage get route
+*/
 app.get('/',function (req,res) {
     Snyt.find({}).exec().then(function(snyt) {
         //TODO tilføj så man kan se hvilke man har læse kvitteret
@@ -103,7 +119,13 @@ app.get('/',function (req,res) {
     // res.render('index');
 });
 
-// Login post route
+/*
+ * Login post route
+ *
+ * Recieve login data from user and try to find user in mongo
+ * if found redirect to the login page
+ * else create UNF page
+ */
 app.post('/',function (req,res) {
     User.findOne({email: req.body.user.email, password: req.body.user.password}, function (err,doc) {
         if(err){
@@ -120,18 +142,30 @@ app.post('/',function (req,res) {
     });
 });
 
-// Logout route
+/*
+ * Logout route
+ */
 app.get('/logout',function (req,res) {
     req.session.loggedIn = null;
     res.redirect('/');
 });
 
-// Render create snyt screen
+//----------------------------------------------
+// SNYT CRUD routes
+
+/*
+ * Render create snyt screen
+ */
 app.get('/opretsnyt', function (req,res) {
     res.render('createSnyt');
 });
 
-// Create new snyt route
+/*
+ * Create new snyt route
+ *
+ * Recieve SNYT data from user and create the document in mongo
+ * Then redirect to /
+ */
 app.post('/opretsnyt',function (req,res) {
     var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
@@ -151,18 +185,21 @@ app.post('/opretsnyt',function (req,res) {
     res.redirect('/');
 });
 
-// SNYT Read, mark as læsekvitteret, update and delete routes
+/*
+ * SNYT Read, mark as læsekvitteret, update and delete routes
+ */
+app.route('/snyt/:id')
     // Read SNYT
-    app.get('/snyt/:id', function (req, res) {
+    .get(function (req, res) {
         Snyt.find({_id: req.params.id}).exec().then(function(doc) {
             res.render('showSnyt', {snyt: doc});
         }).catch(function (err) {
             console.log('du er blevet snyt hehe (: \n'+err);
             res.send('Error:' + err.toString());
         });
-    });
+    })
     // Mark a SNYT as læsekvitteret
-    app.post('/snyt/:id', function (req,res) {
+    .post(function (req,res) {
         Snyt.find({_id: req.params.id}).exec().then(function(doc) {
             /*
              * find eget user _id.
@@ -174,8 +211,46 @@ app.post('/opretsnyt',function (req,res) {
         });
         res.redirect('/');
     });
-    //TODO update and delete
 
+/*
+ *
+ */
+app.post('/editSnyt',function (req, res) {
+    var newSnyt = new Snyt();
+    newSnyt.subject = req.body.snyt.subject;
+    newSnyt.category = req.body.snyt.category;
+    newSnyt.text = req.body.snyt.text;
+    newSnyt.user = req.body.snyt.user;
+    newSnyt.created = req.body.snyt.created;
+    newSnyt.edok = req.body.snyt.edok;
+    newSnyt._id = req.body.snyt._id;
+
+    Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
+        console.log(doc);
+        var docarray = [];
+        docarray.push(doc);
+
+        res.render('showSnyt',{snyt:docarray});
+    }).catch(function (err) {
+        console.log(err);
+    });
+});
+
+/*
+ *
+ */
+app.get('/editSnyt/:id',function (req, res) {
+    Snyt.find({_id: req.params.id}).exec(function (err,doc) {
+        res.render('editSnyt',{snyt:doc});
+    });
+});
+
+//----------------------------------------------
+// Search routes
+
+/*
+ * 
+ */
 app.get('/search', function(req, res) {
     Snyt.find({}).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
@@ -186,6 +261,9 @@ app.get('/search', function(req, res) {
     });
 });
 
+/*
+ * 
+ */
 app.get('/search/:text', function(req, res) {
     var reg = new RegExp(".*" + req.params.text + ".*", "i");
     Snyt.find({"$or":[{"subject": reg}, {"text": reg}]}).sort({"created" : -1}).exec(function(err, doc) {
@@ -197,6 +275,9 @@ app.get('/search/:text', function(req, res) {
     });
 });
 
+/*
+ *
+ */
 app.post('/search', function(req, res) {
     var text = req.body.text;
     var dateFrom = new Date(req.body.dateFrom);
@@ -249,7 +330,12 @@ app.post('/search', function(req, res) {
     });
 });
 
-// Get admin side (login side hvis man ikke er authenticated)
+//----------------------------------------------
+// Admin routes
+
+/*
+ * Get admin side (login side hvis man ikke er authenticated)
+ */
 app.get('/admin', function(req, res) {
     var allUsers = null;
     var errors = null;
@@ -266,7 +352,9 @@ app.get('/admin', function(req, res) {
     });
 });
 
-// Opret ny bruger i systemet
+/*
+ * Opret ny bruger i systemet
+ */
 app.post('/admin', function(req, res) {
     var errors = [];
     User.find({"email" : req.body.user.email}).exec(function(err, doc) {
@@ -304,7 +392,9 @@ app.post('/admin', function(req, res) {
     res.redirect('/admin');
 });
 
-// Rediger en bruger
+/*
+ * Rediger en bruger
+ */
 app.put('/admin', function(req, res) {
     User.findById(mongoose.Types.ObjectId(req.body.id), function(err, u) {
         if(err) {
@@ -328,13 +418,17 @@ app.put('/admin', function(req, res) {
     });
 });
 
-// Slet en bruger
+/*
+ * Slet en bruger
+ */
 app.delete('/admin', function(req, res) {
     User.find({"_id" : mongoose.Types.ObjectId(req.body.id)}).remove().exec();
     res.render('admin');
 });
 
-// Login som admin
+/*
+ * Login som admin
+ */
 app.post('/admin/login', function(req, res) {
     var adminUsername = "administrator";
     var adminPassword = "pokemon";
@@ -345,12 +439,17 @@ app.post('/admin/login', function(req, res) {
     res.redirect('/admin');
 });
 
+/*
+ * Log out as admin
+ */
 app.get('/admin/logout', function(req, res) {
     req.session.adminLoggedIn = null;
     res.redirect('/admin');
 });
 
-// Hjælpefunktion til at få ID på en bruger med email og password i POST
+/*
+ * Hjælpefunktion til at få ID på en bruger med email og password i POST
+ */
 app.post('/admin/user', function(req, res) {
     var email = req.body.email;
     var password = req.body.password;
@@ -366,32 +465,10 @@ app.post('/admin/user', function(req, res) {
     });
 });
 
-app.get('/editSnyt/:id',function (req, res) {
-    Snyt.find({_id: req.params.id}).exec(function (err,doc) {
-        res.render('editSnyt',{snyt:doc});
-    });
-});
-app.post('/editSnyt',function (req, res) {
-    var newSnyt = new Snyt();
-    newSnyt.subject = req.body.snyt.subject;
-    newSnyt.category = req.body.snyt.category;
-    newSnyt.text = req.body.snyt.text;
-    newSnyt.user = req.body.snyt.user;
-    newSnyt.created = req.body.snyt.created;
-    newSnyt.edok = req.body.snyt.edok;
-    newSnyt._id = req.body.snyt._id;
-
-    Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
-        console.log(doc);
-        var docarray = [];
-        docarray.push(doc);
-
-        res.render('showSnyt',{snyt:docarray});
-    }).catch(function (err) {
-        console.log(err);
-    });
-});
-
+//**********************************************************************
+// Listen(), exports and test misc
+//**********************************************************************
+ 
 //Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
 //if (!module.parent) {
 //    app.listen(1337);
@@ -407,6 +484,7 @@ var shutdown = function() {
     mongoose.connection.close();
     server.close();
 };
+
 module.exports = {
     app: app,
     shutdown: shutdown
