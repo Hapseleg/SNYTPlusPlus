@@ -1,0 +1,28 @@
+extends layout.pug
+block body
+    if(authenticated)
+        form(action="/updateSnyt/"+snytid, method="POST")
+            div(class="row")
+                div(class="col-2")
+                    fieldset
+                    ul(type="none")
+                        li
+                            a(href="/")
+                                button(type="button" class="btn btn-primary") Gå tilbage
+                        li
+                        label Dato
+                            input(type="date" name="subsnyt[created]")
+                        li
+                        label Initialer
+                            input(type="text" name="subsnyt[user]")
+
+                        li
+                            button(type="submit" class="btn btn-primary") OK
+                        li=snytid
+                        input(type="text" name="subsnyt[_id]" value=snytid hidden)
+
+                div(class="col-10")
+                    ul(type="none")
+                        li
+                            textarea(rows="20" cols="150" name="subsnyt[text]")
+

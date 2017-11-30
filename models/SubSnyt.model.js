@@ -5,14 +5,11 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var SnytSchema = new Schema({
-    subject: String,
-    category: String,
     text: String,
     user: String,
     created: {type: Date, default: Date.now},
-    edok : String,
-    idSubSnyts: []
     // notReadBy: []
+
 });
 
-module.exports = mongoose.model('Snyts', SnytSchema);
+module.exports = mongoose.model('subsnyts', SnytSchema);
