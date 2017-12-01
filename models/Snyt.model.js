@@ -27,9 +27,8 @@ var SnytSchema = new Schema({
     user: String,
     created: {type: Date, default: Date.now},
     edok : String,
-    idSubSnyts: []
+    idSubSnyts: [],
     // notReadBy: []
-    edok : String,
     readBy: {type: Array}
 });
 
