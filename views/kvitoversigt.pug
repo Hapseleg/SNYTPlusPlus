@@ -1,0 +1,13 @@
+extends layout.pug
+block body
+    if(authenticated)
+        div(class="container")
+            input#hiddenInputForUserAmount(hidden value=users)
+            table(class="table")
+                thead
+                    tr
+                        th Emne
+                        th Dato
+                        th Initialer
+                        th Mangler at læse
+                tbody#snytKvitOversigt

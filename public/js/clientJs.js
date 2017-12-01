@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    var pathName = window.location.pathname;
     var now = new Date();
     var dayNow = ("0" + now.getDate()).slice(-2);
     var monthNow = ("0" + (now.getMonth() + 1)).slice(-2);
@@ -12,7 +13,16 @@ $(document).ready(function() {
     var dateBefore = before.getFullYear() + "-" + (monthBefore) + "-" + (dayBefore);
     $("#advDateFrom").val(dateBefore);
 
-    advancedSearch();
+    if(pathName == "/") {
+        advancedSearch();
+    }
+    if(pathName == "/kvitoversigt") {
+        kvitOversigt();
+    }
+    console.log(pathName);
+    if(pathName == "kvit") {
+        getUserDataKvit();
+    }
 });
 
 function regularSearch() {
@@ -20,7 +30,7 @@ function regularSearch() {
     if(searchText.length > 1) {
         searchText = "/" + searchText;
     }
-    console.log(searchText);
+    var userId = $("#hiddenInput").val();
     $.ajax("/search" + searchText,
         {
             method : "GET",
@@ -31,12 +41,22 @@ function regularSearch() {
                     var subject = documents[i].subject;
                     var date = documents[i].created.toString().substring(0, 10);
                     var initials = documents[i].user;
-                    var read = "//TODO";
+                    var read = "";
+                    if(documents[i].readBy) {
+                        if(documents[i].readBy.includes(userId)) {
+                            read = "X";
+                        } else {
+                            read = "";
+                        }
+                    }
                     table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
                 }
                 $(".clickableRow").click(function() {
                     window.location = "/snyt/" + $(this).data("href");
                 });
+                if(window.location.pathname != "/") {
+                    window.location = "/";
+                }
             }
         }
     );
@@ -58,18 +78,59 @@ function advancedSearch() {
             read : read
         }
     ).done(function(documents) {
-        console.log(documents);
         var table = $("#snytOversigt");
+        var userId = $("#hiddenInput").val();
         table.html("");
         for(var i in documents) {
             var subject = documents[i].subject;
             var date = documents[i].created.toString().substring(0, 10);
             var initials = documents[i].user;
             var read = "//TODO";
+            if(documents[i].readBy) {
+                if(documents[i].readBy.includes(userId)) {
+                    read = "X";
+                } else {
+                    read = "";
+                }
+            }
             table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
         }
         $(".clickableRow").click(function() {
             window.location = "/snyt/" + $(this).data("href");
         });
+        if(window.location.pathname != "/") {
+            window.location = "/";
+        }
     });
+}
+
+function kvitOversigt() {
+    $.ajax("/search",
+        {
+            method : "GET",
+            success : function(documents) {
+                var table = $("#snytKvitOversigt");
+                table.empty();
+                for(var i in documents) {
+                    var doc = documents[i];
+                    var subject = doc.subject;
+                    console.log(doc);
+                    var date = doc.created.toString().substring(0, 10);
+                    var initials = doc.user;
+                    console.log($("#hiddenInputForUserAmount").val());
+                    var read = $("#hiddenInputForUserAmount").val() - doc.readBy.length;
+
+                    table.append("<tr class='clickableKvitRow' data-href=" + doc._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
+                }
+                $(".clickableKvitRow").click(function() {
+                    window.location.href = "/kvit/" + $(this).data("href");
+                });
+            }
+        }
+    );
+    getUserDataKvit();
+}
+
+function getUserDataKvit() {
+    console.log($("#kvitListJ").val());
 }
