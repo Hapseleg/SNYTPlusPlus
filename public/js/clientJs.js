@@ -134,3 +134,99 @@ function kvitOversigt() {
 function getUserDataKvit() {
     console.log($("#kvitListJ").val());
 }
+
+//admin CRUD
+
+function findUser(caller) {
+	var user = $(caller).find("a").data("user");
+	$("#editModal").find("#first").val(user.first);
+	$("#editModal").find("#last").val(user.last);
+	$("#editModal").find("#initials").val(user.initials);
+	$("#editModal").find("#email").val(user.email);
+	$("#editModal").find("#password").val(user.password);
+	$("#editModal").find("#id").val(user._id);
+	return user;
+};
+
+function createUser() {
+	
+	var fornavn = $("#fornavn").val();
+	var efternavn = $("#efternavn").val();
+	var initialer = $("#initialer").val();
+	var email = $("#email").val();
+	var password = $("#password").val();
+	
+	// validering
+	
+	if(!fornavn.length > 0) {
+		alert("Fornavn skal udfyldes");
+	}
+	else if(!efternavn.length > 0) {
+		alert("Efternavn skal udfyldes");
+	}
+	else if(!initialer.length > 0) {
+		alert("Initialer skal udfyldes");
+	}
+	else if(!email.length > 0) {
+		alert("Email skal udfyldes");
+	}
+	else if(!password.length > 0) {
+		alert("Adgangskode skal udfyldes");
+	}
+	else {
+		$.post("/admin",
+			{
+				user: {
+					first: fornavn,
+					last: efternavn,
+					initials: initialer,
+					email: email,
+					password: password
+				}
+			});
+		$("#createModal").modal("hide");
+	}
+}
+
+function updateUser() {
+	
+	var first = $("#editModal").find("#first").val();
+	var last = $("#editModal").find("#last").val();
+	var initials = $("#editModal").find("#initials").val();
+	var email = $("#editModal").find("#email").val();
+	var password = $("#editModal").find("#password").val();
+	var id = $("#editModal").find("#id").val();
+	
+	// validering
+	if(!first.length > 0) {
+		alert("Fornavn skal udfyldes");
+	}
+	else if(!last.length > 0) {
+		alert("Efternavn skal udfyldes");
+	}
+	else if(!initials.length > 0) {
+		alert("Initialer skal udfyldes");
+	}
+	else if(!email.length > 0) {
+		alert("Email skal udfyldes");
+	}
+	else if(!password.length > 0) {
+		alert("Adgangskode skal udfyldes");
+	}
+	else {
+		$.ajax("/admin",
+			{
+				method: "PUT",
+				first: fornavn,
+				last: efternavn,
+				initials: initialer,
+				email: email,
+				password: password,
+				id: id
+			}
+		);
+	}
+}
+
+function deleteUser() {
+}
