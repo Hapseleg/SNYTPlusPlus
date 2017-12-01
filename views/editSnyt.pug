@@ -11,14 +11,14 @@ block body
                                 button(type="button" class="btn btn-primary") Gå tilbage
                         li
                             label e-Dok
-                                input(type="text" name="snyt[edok]" value=snyt[0].edok)
+                                input(type="text" name="snyt[edok]" value=snyt.edok)
                         li
                         label Dato
-                            input(type="date" name="snyt[created]" value=value=snyt[0].created.toLocaleDateString())
+                            input(type="date" name="snyt[created]" value=value=snyt.created.toLocaleDateString())
                             //input(type="text" name="snyt[created]" value=snyt[0].created)
                         li
                         label Initialer
-                            input(type="text" name="snyt[user]", value=snyt[0].user)
+                            input(type="text" name="snyt[user]", value=snyt.user)
                         li
                         label Kategori
                             select(name="snyt[category]")
@@ -34,12 +34,12 @@ block body
                         li
                             button(type="submit" class="btn btn-primary") OK
 
-                        input(type="text" name="snyt[_id]" value=snyt[0]._id hidden)
+                        input(type="text" name="snyt[_id]" value=snyt._id hidden)
 
                 div(class="col-10")
                     ul(type="none")
                         li
-                            input(type="text" name="snyt[subject]" value=snyt[0].subject)
+                            input(type="text" name="snyt[subject]" value=snyt.subject)
                         li
-                            textarea(rows="20" cols="150" name="snyt[text]").form-control=snyt[0].text
+                            textarea(rows="20" cols="150" name="snyt[text]").form-control=snyt.text
 

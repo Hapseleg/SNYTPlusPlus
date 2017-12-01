@@ -24,12 +24,15 @@ block body
                             a(href="/editsnyt/" + snyt._id)
                                 button(type="button" class="btn btn-primary") Rediger SNYT
                         li
-                            a(href="/updateSnyt/" + snyt[0]._id)
+                            a(href="/updateSnyt/" + snyt._id)
                                 button(type="button" class="btn btn-primary") Update SNYT
 
                         if (userHasNotRead)
                             li
                                 button(type="submit" class="btn btn-primary") Kvitter
+                        if(snytHasSubSnyt)
+                            each sub in subSnytsInSnyt
+                                li=sub.text
 
                 div(class="col-10")
                     ul(type="none")
