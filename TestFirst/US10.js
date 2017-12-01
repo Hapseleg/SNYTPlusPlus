@@ -33,7 +33,7 @@ function createTestSnyt (done){
             sejeId = snyt._id;
             console.log(sejeId);
             console.log('yup');
-            console.log(nysnyt.notReadBy);
+            console.log(nysnyt.readBy);
 
             done();
         }
@@ -80,7 +80,6 @@ var snyt1;
 
 describe('/GET/snyt/:id snyt', function () {
     before(function (done) {
-        app=app.listen(1337);
         Snyt.remove({subject: 'us10test'});
         console.log('snyt removed');
         done();
@@ -89,7 +88,7 @@ describe('/GET/snyt/:id snyt', function () {
         createTestSnyt(done);
     });
     before(function (done) {
-        var agent = chai.request.agent(app);
+        var agent = chai.request.agent('http://localhost:1337');
         agent.post('/').type('form').send( {user: { email: 'test@test.dk', password: '123' }}).then(function (res) {
             //console.log(res);
             //expect(res).to.have.cookie('sessionid');
@@ -145,7 +144,6 @@ describe('/GET/snyt/:id snyt', function () {
     });
     after(function (done) {
         console.log('lort');
-        app.close();
         done();
     })
 });
