@@ -9,12 +9,9 @@ html
         script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
         script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous")
         script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous")
-
+        script(src='js/clientJs.js')
     body
-
-
         if(authenticatedAdmin)
-
             nav(class="navbar navbar-expand-sm navbar-light bg-info")
                 div(class="collapse navbar-collapse" id="navbarSupportedContent")
                     ul(class="navbar-nav mr-auto")
@@ -22,10 +19,11 @@ html
                         class="nav-link"
                         href="#"
                         data-toggle="modal"
-                        data-target="#exampleModal"
+                        data-target="#createModal"
                         style="font-size: 30px; font-weight: bold;") Opret bruger
-
-            #exampleModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+            // create user modal
+            #createModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel',
+            aria-hidden='true')
                 .modal-dialog(role='document')
                     .modal-content
                         .modal-header
@@ -51,15 +49,47 @@ html
                                     input#password.form-control(type='text')
                         .modal-footer
                             button.btn.btn-secondary(type='button', data-dismiss='modal') Luk
-                            button.btn.btn-primary(type='button') Opret
+                            button.btn.btn-primary(type='button' onclick="createUser()") Opret
             br
 
             if !errors
-                ul(class="list-group")
+                ul(class="user-list")
                     each user in allUsers
-                        li
-                            a.list-group-item.list-group-item-action(href="/admin")  #{user.first} #{user.last}  (#{user.initials})
+                        li(class="nodecoration" onclick="findUser(this);")
+                            a.list-group-item.list-group-item-action(href="#" data-toggle="modal"
+                            data-target="#editModal" data-user=user) #{user.first}
+                                |   #{user.last} (#{user.initials})
                         br
+                #editModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel',
+                aria-hidden='true')
+                    .modal-dialog(role='document')
+                        .modal-content
+                            .modal-header
+                                h5#exampleModalLabel.modal-title Opdater/slet bruger
+                                button.close(type='button', data-dismiss='modal', aria-label='Close')
+                                    span(aria-hidden='true') ×
+                            .modal-body
+                                form
+                                    input#id(hidden)
+                                    .form-group
+                                        label.form-control-label(for='fornavn') Fornavn:
+                                        input#first.form-control(type='text')
+                                    .form-group
+                                        label.form-control-label(for='efternavn') Efternavn:
+                                        input#last.form-control(type='text')
+                                    .form-group
+                                        label.form-control-label(for='initialer') Initialer:
+                                        input#initials.form-control(type='text')
+                                    .form-group
+                                        label.form-control-label(for='email') Email:
+                                        input#email.form-control(type='email')
+                                    .form-group
+                                        label.form-control-label(for='password') Adgangskode:
+                                        input#password.form-control(type='text')
+                            .modal-footer
+                                button.btn.btn-primary(type='button' onclick='updateUser()') Opdater
+                                button.btn.btn-secondary(type='button' id="btnDelete") Slet
+                                button.btn.btn-secondary(type='button', data-dismiss='modal') Annuller
         else
             nav(class="navbar navbar-expand-lg navbar-light bg-light")
                 a(class="navbar-brand" href="/") ADMIN LOGIN
@@ -76,7 +106,4 @@ html
                         input(name="adminPassword", type="password")
                     p
                         button(type="submit" class="btn btn-primary") Log Ind
-
-
     block body
-//Hvis man ikke er logget ind kommer det her:
