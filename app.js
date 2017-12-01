@@ -10,7 +10,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     rp = require('request-promise'),
     config = require('config'),
-    subSnyt = require('./models/Subsnyt.model'),
+    SubSnyt = require('./models/Subsnyt.model'),
     Snyt = require('./models/Snyt.model'),
     User = require('./models/User.model');
 
@@ -202,7 +202,7 @@ app.get('/updateSnyt/:id', function (req,res) {
     res.render('updateSnyt', {snytid: req.params.id});
 });
 app.post('/updateSnyt/:id',function (req,res) {
-    var newsubsnyt = new subSnyt();
+    var newsubsnyt = new SubSnyt();
     newsubsnyt.text = req.body.subsnyt.text;
     newsubsnyt.user = req.body.subsnyt.user;
     newsubsnyt.created = req.body.subsnyt.created;
@@ -211,11 +211,9 @@ app.post('/updateSnyt/:id',function (req,res) {
         if(err){
             res.send('Error:'+err.toString());
         }
-        console.log("IDDDDDDDD: " + req.params.id);
 
-        // Snyt.findOneAndUpdate({_id: req.params.id},{$push: {idSubSnyts: req.params.id }});
-
-        Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: req.params.id }})
+        console.log("IDDDDDDDDD: "+subsnyt.id);
+        Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id }})
             .catch(function (err) {
                 console.log(err);
                 res.send('\n \n Error:' + err.toString());
@@ -223,6 +221,7 @@ app.post('/updateSnyt/:id',function (req,res) {
     });
     res.redirect('/');
 });
+
 /*
  * SNYT Read and mark as læsekvitteret routes
  */
@@ -230,27 +229,20 @@ app.route('/snyt/:id').get(function (req, res) {
     let userID = req.session.loggedIn;
     let notUserRead = true;
     let hasSubSnyt = false;
-    let subsnyts = [];
     Snyt.findById(req.params.id).exec().then(function(doc) {
         if(doc.readBy.includes(userID)){
             notUserRead = false;
         }
-        //check for opdateret SNYT
         if(doc.idSubSnyts.length>0){
-            //hvis der er opdateret snyt skal de hentes og smides med i render
             hasSubSnyt = true;
-
-            for(let i = 0; i< doc.idSubSnyts.length;i++){
-                Snyt.findById(req.params.id).exec().then(function(doc) {
-                    subsnyts.push(doc);
-                }).catch(function (err) {
-                    console.log(err);
-                    res.send('Error:' + err.toString());
-                });
-            }
         }
 
-        res.render('showSnyt', {snyt: doc, userHasNotRead: notUserRead, snytHasSubSnyt : hasSubSnyt, subSnytsInSnyt : subsnyts});
+        SubSnyt.find({"$or":[{"_id":doc.idSubSnyts}]}).exec(function (err, subdoc) {
+            if(err){
+                throw err;
+            }
+            res.render('showSnyt', {snyt: doc, userHasNotRead: notUserRead, snytHasSubSnyt : hasSubSnyt, subSnytsInSnyt : subdoc});
+        });
     }).catch(function (err) {
         console.log('du er blevet snyt hehe (: \n'+err);
         res.send('Error:' + err.toString());
