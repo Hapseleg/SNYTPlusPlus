@@ -199,7 +199,6 @@ app.post('/opretsnyt',function (req,res) {
     res.redirect('/');
 });
 app.get('/updateSnyt/:id', function (req,res) {
-    console.log(req.params.id);
     res.render('updateSnyt', {snytid: req.params.id});
 });
 app.post('/updateSnyt/:id',function (req,res) {
@@ -207,44 +206,56 @@ app.post('/updateSnyt/:id',function (req,res) {
     newsubsnyt.text = req.body.subsnyt.text;
     newsubsnyt.user = req.body.subsnyt.user;
     newsubsnyt.created = req.body.subsnyt.created;
-    console.log(newsubsnyt);
-    console.log(req.params.id);
-    console.log(req.body.subsnyt);
 
     newsubsnyt.save(function (err, subsnyt) {
         if(err){
             res.send('Error:'+err.toString());
         }
-        console.log('her er lorten');
-        console.log(subsnyt);
-        console.log(req.params.id);
-        Snyt.findOneAndUpdate({_id: req.params.id},{$push: {idSubSnyts: subsnyt._id }}
+        console.log("IDDDDDDDD: " + req.params.id);
 
-            );
+        // Snyt.findOneAndUpdate({_id: req.params.id},{$push: {idSubSnyts: req.params.id }});
 
-
+        Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: req.params.id }})
+            .catch(function (err) {
+                console.log(err);
+                res.send('\n \n Error:' + err.toString());
+            });
     });
     res.redirect('/');
 });
 /*
  * SNYT Read and mark as læsekvitteret routes
  */
-app.route('/snyt/:id')
-    //TODO
-    // GET - Read SNYT
-    .get(function (req, res) {
-        let userID = req.session.loggedIn;
-        let notUserRead = true;
-        Snyt.findById(req.params.id).exec().then(function(doc) {
-            if(doc.readBy.includes(userID)){
-                notUserRead = false;
+app.route('/snyt/:id').get(function (req, res) {
+    let userID = req.session.loggedIn;
+    let notUserRead = true;
+    let hasSubSnyt = false;
+    let subsnyts = [];
+    Snyt.findById(req.params.id).exec().then(function(doc) {
+        if(doc.readBy.includes(userID)){
+            notUserRead = false;
+        }
+        //check for opdateret SNYT
+        if(doc.idSubSnyts.length>0){
+            //hvis der er opdateret snyt skal de hentes og smides med i render
+            hasSubSnyt = true;
+
+            for(let i = 0; i< doc.idSubSnyts.length;i++){
+                Snyt.findById(req.params.id).exec().then(function(doc) {
+                    subsnyts.push(doc);
+                }).catch(function (err) {
+                    console.log(err);
+                    res.send('Error:' + err.toString());
+                });
             }
-            res.render('showSnyt', {snyt: doc, userHasNotRead: notUserRead});
-        }).catch(function (err) {
-            console.log('du er blevet snyt hehe (: \n'+err);
-            res.send('Error:' + err.toString());
-        });
+        }
+
+        res.render('showSnyt', {snyt: doc, userHasNotRead: notUserRead, snytHasSubSnyt : hasSubSnyt, subSnytsInSnyt : subsnyts});
+    }).catch(function (err) {
+        console.log('du er blevet snyt hehe (: \n'+err);
+        res.send('Error:' + err.toString());
     });
+});
 
 
 // POST -  Mark a SNYT as læsekvitteret -> redirect to /
@@ -281,11 +292,9 @@ app.post('/editSnyt',function (req, res) {
     newSnyt._id = req.body.snyt._id;
 
     Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
-        console.log(doc);
-        var docarray = [];
-        docarray.push(doc);
 
-        res.render('showSnyt',{snyt:docarray});
+
+        res.render('showSnyt',{snyt:doc});
     }).catch(function (err) {
         console.log(err);
     });
@@ -295,8 +304,12 @@ app.post('/editSnyt',function (req, res) {
  *
  */
 app.get('/editSnyt/:id',function (req, res) {
-    Snyt.find({_id: req.params.id}).exec(function (err,doc) {
-        res.render('editSnyt',{snyt:doc});
+    Snyt.findById(req.params.id).exec().then(function(doc) {
+        res.render('editSnyt', {snyt: doc});
+        console.log(doc);
+    }).catch(function (err) {
+        console.log(err);
+        res.send('Error:' + err.toString());
     });
 });
 

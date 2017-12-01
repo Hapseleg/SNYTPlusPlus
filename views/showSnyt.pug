@@ -30,6 +30,9 @@ block body
                         if (userHasNotRead)
                             li
                                 button(type="submit" class="btn btn-primary") Kvitter
+                        if(snytHasSubSnyt)
+                            each sub in subSnytsInSnyt
+                                li=sub.text
 
                 div(class="col-10")
                     ul(type="none")
