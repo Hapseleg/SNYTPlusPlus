@@ -354,9 +354,9 @@ app.post('/search', function(req, res) {
     var categoryOption = {};
     var textOption = {};
     if(read == "true") {
-        readOption = {"readBy" : "userPlaceholder"};
+        readOption = {"readBy" : {"$in" : [res.locals.me._id.toString()]}};
     } else if(read == "false") {
-        readOption = {"readBy" : {"$nin" : "userPlaceholder"}};
+        readOption = {"readBy" : {"$nin" : [res.locals.me._id.toString()]}};
     }
     if(category.length > 0) {
         categoryOption = {"category" : category};
@@ -383,7 +383,7 @@ app.post('/search', function(req, res) {
             ]
         }).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
-            throw err;
+            console.log(err);
         } else {
             res.json(doc);
         }
@@ -549,6 +549,34 @@ app.post('/admin/user', function(req, res) {
             throw err;
         }
         res.json(doc._id);
+    });
+});
+
+app.get('/kvitoversigt', function(req, res) {
+    User.find().exec(function(err, doc) {
+       if(err) {
+           res.json(err);
+       }
+       if(!doc) {
+           res.json("Nope");
+       }
+       if(doc) {
+           res.render('kvitoversigt', {users: doc.length});
+       }
+    });
+});
+
+app.get("/kvit/:id", function(req, res) {
+    Snyt.findById(req.params.id).exec(function(err, doc) {
+        if(err) {
+            res.json(err);
+        }
+        if(!doc) {
+            res.json("Nope");
+        }
+        if(doc) {
+            res.render('showKvit', {snyt : doc});
+        }
     });
 });
 
