@@ -39,6 +39,7 @@ function regularSearch() {
                 table.empty();
                 for(var i in documents) {
                     var subject = documents[i].subject;
+                    //TODO add   var category = documents[i].category; ???
                     var date = documents[i].created.toString().substring(0, 10);
                     var initials = documents[i].user;
                     var read = "";
@@ -49,6 +50,7 @@ function regularSearch() {
                             read = "";
                         }
                     }
+                    //TODO add   <td>" + category + "</td> ???
                     table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
                 }
                 $(".clickableRow").click(function() {
@@ -99,6 +101,7 @@ function advancedSearch() {
         table.html("");
         for(var i in documents) {
             var subject = documents[i].subject;
+            //TODO add   var category = documents[i].category; ???
             var date = documents[i].created.toString().substring(0, 10);
             var initials = documents[i].user;
             var read = "//TODO";
@@ -109,6 +112,7 @@ function advancedSearch() {
                     read = "";
                 }
             }
+            //TODO add   <td>" + category + "</td> ???
             table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
         }
         $(".clickableRow").click(function() {
@@ -131,12 +135,14 @@ function kvitOversigt() {
                 for(var i in documents) {
                     var doc = documents[i];
                     var subject = doc.subject;
+                    //TODO add   var category = doc.category; ???
                     console.log(doc);
                     var date = doc.created.toString().substring(0, 10);
                     var initials = doc.user;
                     console.log($("#hiddenInputForUserAmount").val());
                     var read = $("#hiddenInputForUserAmount").val() - doc.readBy.length;
 
+                    //TODO add   <td>" + category + "</td> ???
                     table.append("<tr class='clickableKvitRow' data-href=" + doc._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
                 }
                 $(".clickableKvitRow").click(function() {
