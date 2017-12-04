@@ -7,18 +7,17 @@ block body
                     fieldset
                     ul(type="none")
                         li
-                            a(href="/")
+                            a(href="/snyt/"+snytid)
                                 button(type="button" class="btn btn-primary") Gå tilbage
                         li
                         label Dato
-                            input(type="date" name="subsnyt[created]")
+                            input(type="date" name="subsnyt[created]" value=date)
                         li
                         label Initialer
-                            input(type="text" name="subsnyt[user]")
+                            input(type="text" name="snyt[user]" disabled="disabled" value=me.initials)
 
                         li
                             button(type="submit" class="btn btn-primary") OK
-                        li=snytid
                         input(type="text" name="subsnyt[_id]" value=snytid hidden)
 
                 div(class="col-10")

@@ -160,7 +160,21 @@ app.get('/logout',function (req,res) {
  * Render create snyt screen
  */
 app.get('/opretsnyt', function (req,res) {
-    res.render('createSnyt');
+    let today = new Date();
+    let yyyy = today.getFullYear();
+    let mm = today.getMonth()+1;
+    let dd = today.getDate();
+
+    if(dd<10){
+        dd='0'+dd;
+    }
+    if(mm<10){
+        mm='0'+mm;
+    }
+
+    var todayString = yyyy+"-"+mm+"-"+dd;
+
+    res.render('createSnyt', {date: todayString});
 });
 
 /*
@@ -188,7 +202,7 @@ app.post('/opretsnyt',function (req,res) {
     //     });
     // }();
 
-    console.log(req.body.snyt.created);
+    // console.log(req.body.snyt.created);
 
     newSnyt.save(function (err, snyt) {
        if(err){
@@ -199,7 +213,22 @@ app.post('/opretsnyt',function (req,res) {
     res.redirect('/');
 });
 app.get('/updateSnyt/:id', function (req,res) {
-    res.render('updateSnyt', {snytid: req.params.id});
+    let today = new Date();
+    let yyyy = today.getFullYear();
+    let mm = today.getMonth()+1;
+    let dd = today.getDate();
+
+    if(dd<10){
+        dd='0'+dd;
+    }
+    if(mm<10){
+        mm='0'+mm;
+    }
+
+    var todayString = yyyy+"-"+mm+"-"+dd;
+
+
+    res.render('updateSnyt', {snytid: req.params.id, date: todayString});
 });
 app.post('/updateSnyt/:id',function (req,res) {
     var newsubsnyt = new SubSnyt();
@@ -212,7 +241,7 @@ app.post('/updateSnyt/:id',function (req,res) {
             res.send('Error:'+err.toString());
         }
 
-        console.log("IDDDDDDDDD: "+subsnyt.id);
+        // console.log("IDDDDDDDDD: "+subsnyt.id);
         Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id }})
             .catch(function (err) {
                 console.log(err);
@@ -253,19 +282,19 @@ app.route('/snyt/:id').get(function (req, res) {
 // POST -  Mark a SNYT as læsekvitteret -> redirect to /
 app.post('/snyt/:id',function (req,res) {
     let userID = req.session.loggedIn;
-    console.log("her er lorten");
-    console.log(req.params.id);
+    // console.log("her er lorten");
+    // console.log(req.params.id);
     Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {readBy: userID}})
         // .exec()
         .catch(function (err) {
             console.log('du er blevet snyt hehe (: \n'+err);
             res.send('\n \n Error:' + err.toString());
         });
-    Snyt.findOne({_id: req.params.id}).exec().then(function (doc) {
-        console.log(doc.readBy);
-    }).catch(function (err) {
-        console.log('\n mere snyt \n' + err);
-    });
+    // Snyt.findOne({_id: req.params.id}).exec().then(function (doc) {
+    //     console.log(doc.readBy);
+    // }).catch(function (err) {
+    //     console.log('\n mere snyt \n' + err);
+    // });
 
     res.redirect('/');
 });
@@ -297,8 +326,24 @@ app.post('/editSnyt',function (req, res) {
  */
 app.get('/editSnyt/:id',function (req, res) {
     Snyt.findById(req.params.id).exec().then(function(doc) {
+
+        //fix dato
+        let yyyy = doc.created.getFullYear();
+        let mm = doc.created.getMonth()+1;
+        let dd = doc.created.getDate();
+
+        // console.log("DAAAY" + dd);
+
+        if(dd<10){
+            dd='0'+dd;
+        }
+        if(mm<10){
+            mm='0'+mm;
+        }
+        doc.createdDate = yyyy+"-"+mm+"-"+dd;
+
         res.render('editSnyt', {snyt: doc});
-        console.log(doc);
+        // console.log(doc);
     }).catch(function (err) {
         console.log(err);
         res.send('Error:' + err.toString());
@@ -474,7 +519,7 @@ app.put('/admin', function(req, res) {
         if(err) {
             returnJson.errors.push(err);
         }
-        console.log(u);
+        // console.log(u);
         if(!u) {
             returnJson.errors.push(new Error("Ingen bruger"));
         }

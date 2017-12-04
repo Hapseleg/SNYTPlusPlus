@@ -63,7 +63,23 @@ function regularSearch() {
 
 }
 
+$('#advancedSearch').on('keyup keypress', function(e) {
+    var keyCode = e.keyCode || e.which;
+    if (keyCode === 13) {
+        e.preventDefault();
+        return false;
+    }
+});
+
 function advancedSearch() {
+    $('#advSearch').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
     var category = $('#advCategory option:selected').val();
     var searchText = $('#advText').val();
     var dateFrom = $('#advDateFrom').val();
@@ -102,6 +118,7 @@ function advancedSearch() {
             window.location = "/";
         }
     });
+    $('#advancedSearch').modal('hide')
 }
 
 function kvitOversigt() {

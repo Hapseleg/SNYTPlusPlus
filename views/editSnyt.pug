@@ -7,23 +7,22 @@ block body
                     fieldset
                     ul(type="none")
                         li
-                            a(href="/")
+                            a(href="/snyt/"+snyt.id)
                                 button(type="button" class="btn btn-primary") Gå tilbage
                         li
                             label e-Dok
                                 input(type="text" name="snyt[edok]" value=snyt.edok)
-                        li=snyt.created.toISOString().toString()
                         li
                         label Dato
-                            input(type="date" name="snyt[created]" value="#{snyt.created.toLocaleDateString()}")
-                            //input(type="text" name="snyt[created]" value=snyt[0].created)
+                            input(type="date" name="snyt[created]" value=snyt.createdDate)
                         li
                         label Initialer
                             input(type="text" name="snyt[user]", value=snyt.user)
                         li
                         label Kategori
+                        div(class="cats")
                             select(name="snyt[category]")
-                                option(value="ac") AC
+                                option(value="AC") AC
                                 option(value="Logistik") Logistik
                                 option(value="Tovholder") Tovholder
                                 option(value="Hygiejne") Hygiejne
@@ -44,3 +43,7 @@ block body
                         li
                             textarea(rows="20" cols="150" name="snyt[text]").form-control=snyt.text
 
+    script.
+        $(document).ready(function () {
+            $('option[value="#{snyt.category}"]').prop("selected", true);
+        })
