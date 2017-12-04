@@ -9,32 +9,15 @@ block body
                         li
                             a(href="/")
                                 button(type="button" class="btn btn-primary") Gå tilbage
-                        //li
-                        //    button(type="button" class="btn btn-primary") Opdater SNYT
-                        //li
-                        //    button(type="button" class="btn btn-primary") Rediger SNYT
-                        //li
-                        //    input(type="checkbox")
-                        //    label Læse Kvitteret
                         li
                         label e-Dok
                             input(type="text" name="snyt[edok]")
-                            //a(href="#" name="snyt[edok]") e-Dok
                         li
                         label Dato
-                            input#advDateFrom(type="date" name="snyt[created]")
-                            //input(type="datetime-local" name="snyt[created]")
-                            //div(class="form-group")
-                            //    div(class="input-group date" id="datetimepicker1")
-                            //        input(type="text" class="form-control")
-                            //        span(class="input-group-addon")
-                            //            span(class="glyphicon glyphicon-calendar")
-                            //    script.
-                            //        $(function(){$('#datetimepicker1').datetimepicker();});
-
+                            input#advDateFrom(type="date" name="snyt[created]" value=date)
                         li
                         label Initialer
-                            input(type="text" name="snyt[user]")
+                            input(type="text" name="snyt[user]" disabled="disabled" value=me.initials)
                         li
                         label Kategori
                             //input(type="text" name="snyt[category]")
