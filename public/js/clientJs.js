@@ -234,9 +234,9 @@ function updateUser() {
 		$.ajax("/admin",
 			{
 				method: "PUT",
-				first: fornavn,
-				last: efternavn,
-				initials: initialer,
+				first: first,
+				last: last,
+				initials: initials,
 				email: email,
 				password: password,
 				id: id

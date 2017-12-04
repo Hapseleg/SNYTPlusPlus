@@ -248,7 +248,7 @@ app.post('/updateSnyt/:id',function (req,res) {
                 res.send('\n \n Error:' + err.toString());
             });
     });
-    res.redirect('/');
+    res.redirect('/snyt/'+req.params.id);
 });
 
 /*
@@ -523,8 +523,8 @@ app.put('/admin', function(req, res) {
         if(!u) {
             returnJson.errors.push(new Error("Ingen bruger"));
         }
-        u.firstName = req.body.firstName;
-        u.lastName = req.body.lastName;
+        u.first = req.body.first;
+        u.last = req.body.last;
         u.password = req.body.password;
         u.email = req.body.email;
         u.initials = req.body.initials;
@@ -535,7 +535,7 @@ app.put('/admin', function(req, res) {
             } else {
                 returnJson.message = "success";
             }
-            res.redirect("/admin", returnJson);
+            res.render("admin", returnJson);
         });
     });
 });
