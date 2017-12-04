@@ -509,34 +509,35 @@ app.post('/admin', function(req, res) {
 /*
  * Rediger en bruger
  */
-app.put('/admin', function(req, res) {
+app.post('/admin/:userid', function(req, res) {
     var returnJson = {
         errors : [],
         message : null,
         data : null
     };
-    User.findById(mongoose.Types.ObjectId(req.body.id), function(err, u) {
+    User.findById(mongoose.Types.ObjectId(req.params.userid), function(err, u) {
         if(err) {
             returnJson.errors.push(err);
         }
-        // console.log(u);
         if(!u) {
             returnJson.errors.push(new Error("Ingen bruger"));
         }
-        u.firstName = req.body.firstName;
-        u.lastName = req.body.lastName;
-        u.password = req.body.password;
-        u.email = req.body.email;
-        u.initials = req.body.initials;
-        u.save(function(err) {
-            if(err) {
-                returnJson.errors.push(err);
-                returnJson.message = "Something went wrong";
-            } else {
-                returnJson.message = "success";
-            }
-            res.redirect("/admin", returnJson);
-        });
+        if(returnJson.errors.length == 0) {
+            u.first = req.body.first;
+            u.last = req.body.last;
+            u.password = req.body.password;
+            u.email = req.body.email;
+            u.initials = req.body.initials;
+            u.save(function(err) {
+                if(err) {
+                    returnJson.errors.push(err);
+                    returnJson.message = "Something went wrong";
+                } else {
+                    returnJson.message = "success";
+                }
+            });
+        }
+        res.render("admin", returnJson);
     });
 });
 
