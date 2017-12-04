@@ -5,3 +5,7 @@
 .nodecoration {
     list-style-type: none;
 }
+
+.clickableKvitRow {
+    cursor: pointer;
+}
