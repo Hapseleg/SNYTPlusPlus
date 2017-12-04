@@ -29,16 +29,19 @@ function regularSearch() {
     var searchText = $("#regularSearchText").val();
     if(searchText.length > 1) {
         searchText = "/" + searchText;
+    } else {
+        searchText = "";
     }
-    var userId = $("#hiddenInput").val();
     $.ajax("/search" + searchText,
         {
             method : "GET",
             success : function(documents) {
                 var table = $("#snytOversigt");
                 table.empty();
+                var userId = $("#hiddenInput").val();
                 for(var i in documents) {
                     var subject = documents[i].subject;
+                    console.log(subject);
                     var date = documents[i].created.toString().substring(0, 10);
                     var initials = documents[i].user;
                     var read = "";
@@ -52,11 +55,11 @@ function regularSearch() {
                     table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
                 }
                 $(".clickableRow").click(function() {
-                    window.location = "/snyt/" + $(this).data("href");
+                    window.location.href = "http://localhost:1337/snyt/" + $(this).data("href");
                 });
-                if(window.location.pathname != "/") {
-                    window.location = "/";
-                }
+                // if(window.location.pathname != "/") {
+                //     window.location = "/search" + searchText;
+                // }
             }
         }
     );
@@ -98,9 +101,9 @@ function advancedSearch() {
         $(".clickableRow").click(function() {
             window.location = "/snyt/" + $(this).data("href");
         });
-        if(window.location.pathname != "/") {
-            window.location = "/";
-        }
+        // if(window.location.pathname != "/") {
+        //     window.location = "/";
+        // }
     });
 }
 
@@ -149,15 +152,15 @@ function findUser(caller) {
 };
 
 function createUser() {
-	
+
 	var fornavn = $("#fornavn").val();
 	var efternavn = $("#efternavn").val();
 	var initialer = $("#initialer").val();
 	var email = $("#email").val();
 	var password = $("#password").val();
-	
+
 	// validering
-	
+
 	if(!fornavn.length > 0) {
 		alert("Fornavn skal udfyldes");
 	}
@@ -189,14 +192,17 @@ function createUser() {
 }
 
 function updateUser() {
-	
+
 	var first = $("#editModal").find("#first").val();
 	var last = $("#editModal").find("#last").val();
 	var initials = $("#editModal").find("#initials").val();
 	var email = $("#editModal").find("#email").val();
 	var password = $("#editModal").find("#password").val();
 	var id = $("#editModal").find("#id").val();
-	
+
+	console.log(first);
+	console.log(id);
+
 	// validering
 	if(!first.length > 0) {
 		alert("Fornavn skal udfyldes");
@@ -214,17 +220,18 @@ function updateUser() {
 		alert("Adgangskode skal udfyldes");
 	}
 	else {
-		$.ajax("/admin",
+	    console.log("Starting AJAX request");
+		$.post("/admin/" + id,
 			{
-				method: "PUT",
-				first: fornavn,
-				last: efternavn,
-				initials: initialer,
-				email: email,
-				password: password,
-				id: id
-			}
+			    first : first,
+                last: last,
+                initials: initials,
+                email: email,
+                password: password,
+                id : id
+            }
 		);
+        $("#editModal").modal("hide");
 	}
 }
 
