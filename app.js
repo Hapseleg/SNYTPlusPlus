@@ -552,6 +552,23 @@ app.post('/admin/user', function(req, res) {
     });
 });
 
+/*
+* Helper method to get all users
+*/
+app.get('/admin/users', function(req, res) {
+    User.find().exec(function(err, doc) {
+        if(err) {
+            res.json(err);
+        }
+        if(!doc) {
+            res.json("Nope");
+        }
+        if(doc) {
+            res.json(doc);
+        }
+    });
+});
+
 app.get('/kvitoversigt', function(req, res) {
     User.find().exec(function(err, doc) {
        if(err) {
@@ -567,6 +584,8 @@ app.get('/kvitoversigt', function(req, res) {
 });
 
 app.get("/kvit/:id", function(req, res) {
+    let allUsersExcept = null;
+    let snyt = null;
     Snyt.findById(req.params.id).exec(function(err, doc) {
         if(err) {
             res.json(err);
@@ -575,7 +594,14 @@ app.get("/kvit/:id", function(req, res) {
             res.json("Nope");
         }
         if(doc) {
-            res.render('showKvit', {snyt : doc});
+            snyt = doc;
+            rp.get("http://localhost:1337/admin/users")
+                .then(function(json) {
+                    allUsersExcept = JSON.parse(json).filter(function(elem) {
+                        return snyt.readBy.indexOf(elem._id) == -1;
+                    });
+                    res.render('showKvit', {snyt : snyt, users : allUsersExcept});
+                });
         }
     });
 });

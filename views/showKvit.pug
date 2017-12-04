@@ -33,7 +33,8 @@ block body
                     li
                         input(type="text" value="Mangler at læsekvittere" disabled = true)
                 ul#kvitList(type="none")
-                    li #{snyt.readBy}
+                    each user in users
+                        li #{user.first} #{user.last} (#{user.initials})
 
 
 

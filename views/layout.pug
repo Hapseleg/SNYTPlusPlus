@@ -8,10 +8,10 @@ html
         )
         link(
         rel="stylesheet"
-        href="css/mainCss.css"
+        href="/css/mainCss.css"
         )
         script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
-        script(src='js/clientJs.js')
+        script(src='/js/clientJs.js')
         script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous")
         script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous")
     body(style="padding-right: 30px")
@@ -25,7 +25,7 @@ html
                 div(class="collapse navbar-collapse" id="navbarSupportedContent")
                     ul(class="navbar-nav mr-auto")
                         li(class="nav-item"): a(class="nav-link" href="/opretsnyt") Opret SNYT
-                        li(class="nav-item"): a(class="nav-link" href="#") Læsekvittering oversigt
+                        li(class="nav-item"): a(class="nav-link" href="/kvitoversigt") Læsekvittering oversigt
                     input(class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="regularSearchText" style="width: 750px;")
                     button(class="btn btn-outline-success my-2 my-sm-0" onClick="regularSearch();") Search
 
