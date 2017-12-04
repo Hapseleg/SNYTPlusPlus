@@ -12,9 +12,10 @@ block body
                         li
                             label e-Dok
                                 input(type="text" name="snyt[edok]" value=snyt.edok)
+                        li=snyt.created.toISOString().toString()
                         li
                         label Dato
-                            input(type="date" name="snyt[created]" value=value=snyt.created.toLocaleDateString())
+                            input(type="date" name="snyt[created]" value="#{snyt.created.toLocaleDateString()}")
                             //input(type="text" name="snyt[created]" value=snyt[0].created)
                         li
                         label Initialer
@@ -39,7 +40,7 @@ block body
                 div(class="col-10")
                     ul(type="none")
                         li
-                            input(type="text" name="snyt[subject]" value=snyt.subject)
+                            input(type="text" name="snyt[subject]" value=snyt.subject style="width: 1073px;")
                         li
                             textarea(rows="20" cols="150" name="snyt[text]").form-control=snyt.text
 

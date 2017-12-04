@@ -36,15 +36,29 @@ block body
                             li
                             label Du har allerede læsekvitteret
                                 button(type="submit" class="btn btn-primary") Kvitter
-
+                div(class="col-10")
+                    ul(type="none")
+                        li
+                            input(type="text" name="snyt[subject]" value=snyt.subject disabled = true style="width: 1073px;")
                         if(snytHasSubSnyt)
-                            each sub in subSnytsInSnyt
-                                li=sub.text
+                            li
+                                textarea(rows="15" cols="150" disabled = true name="snyt[text]").form-control=snyt.text
+                        else
+                            li
+                                textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=snyt.text
+    if(snytHasSubSnyt)
+        each sub in subSnytsInSnyt
+            div(class="row")
+                div(class="col-2")
+                    ul(type="none")
+                        li
+                            label Dato
+                                input(type="text" name="snyt[created]" value=sub.created.toLocaleDateString() disabled=true)
+                            li
+                            label Initialer
+                                input(type="text" name="snyt[user]", value=sub.user disabled = true)
 
                 div(class="col-10")
                     ul(type="none")
                         li
-                            input(type="text" name="snyt[subject]" value=snyt.subject disabled = true)
-                        li
-                            textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=snyt.text
-
+                            textarea(rows="10" cols="150" disabled = true name="snyt[text]").form-control=sub.text
