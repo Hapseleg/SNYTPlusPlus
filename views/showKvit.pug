@@ -9,6 +9,10 @@ block body
                         button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
                     li
                     a(name="snyt[edok]" href=data.snyt.edok) e-Dok
+                        a(href="/snyt/" + snyt.id)
+                            button(type="button" class="btn btn-primary") Gå til SNYT
+                    li
+                    a(name="snyt[edok]" href=snyt.edok) e-Dok
                     li
                     label Dato
                         input(type="text" name="snyt[created]" value=data.snyt.created.toLocaleDateString() disabled=true)
