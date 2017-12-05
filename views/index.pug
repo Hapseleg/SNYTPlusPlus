@@ -6,11 +6,23 @@ block body
                 thead
                     tr
                         th Emne
-                        //TODO add th Kategori???
+                        th Kategori
                         th Dato
                         th Initialer
                         th Læst
                 tbody#snytOversigt
+                    if data
+                        each snyt in data
+                            tr.clickableRow(data-href=snyt._id onclick='gotoSnyt(this)')
+                                td #{snyt.subject}
+                                td #{snyt.category}
+                                td #{snyt.created.toLocaleDateString()}
+                                td #{snyt.user}
+                                if ( snyt.readBy.indexOf(me._id) > 0 )
+                                    td  X
+                                else
+                                    td
+
     else
         //Hvis man ikke er logget ind kommer det her:
         h1 SNYT++

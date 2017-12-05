@@ -1,5 +1,4 @@
 $(document).ready(function() {
-    var pathName = window.location.pathname;
     var now = new Date();
     var dayNow = ("0" + now.getDate()).slice(-2);
     var monthNow = ("0" + (now.getMonth() + 1)).slice(-2);
@@ -13,16 +12,12 @@ $(document).ready(function() {
     var dateBefore = before.getFullYear() + "-" + (monthBefore) + "-" + (dayBefore);
     $("#advDateFrom").val(dateBefore);
 
-    if(pathName == "/") {
-        advancedSearch();
-    }
-    if(pathName == "/kvitoversigt") {
-        kvitOversigt();
-    }
-    console.log(pathName);
-    if(pathName == "kvit") {
-        getUserDataKvit();
-    }
+    $('#advancedSearch').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            e.preventDefault();
+        }
+    });
 });
 
 function regularSearch() {
@@ -32,136 +27,42 @@ function regularSearch() {
     } else {
         searchText = "";
     }
-    $.ajax("/search" + searchText,
-        {
-            method : "GET",
-            success : function(documents) {
-                var table = $("#snytOversigt");
-                table.empty();
-                var userId = $("#hiddenInput").val();
-                for(var i in documents) {
-                    var subject = documents[i].subject;
-                    //TODO add   var category = documents[i].category; ???
-                    var date = documents[i].created.toString().substring(0, 10);
-                    var initials = documents[i].user;
-                    var read = "";
-                    if(documents[i].readBy) {
-                        if(documents[i].readBy.includes(userId)) {
-                            read = "X";
-                        } else {
-                            read = "";
-                        }
-                    }
-                    //TODO add   <td>" + category + "</td> ???
-                    table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
-                }
-                $(".clickableRow").click(function() {
-                    window.location.href = "http://localhost:1337/snyt/" + $(this).data("href");
-                });
-                // if(window.location.pathname != "/") {
-                //     window.location = "/search" + searchText;
-                // }
-            }
-        }
-    );
 
+    window.location = "/search" + searchText;
 }
 
-$('#advancedSearch').on('keyup keypress', function(e) {
-    var keyCode = e.keyCode || e.which;
-    if (keyCode === 13) {
-        e.preventDefault();
-        return false;
-    }
-});
-
 function advancedSearch() {
-    $('#advSearch').on('keyup keypress', function(e) {
-        var keyCode = e.keyCode || e.which;
-        if (keyCode === 13) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
     var category = $('#advCategory option:selected').val();
     var searchText = $('#advText').val();
     var dateFrom = $('#advDateFrom').val();
     var dateTo = $('#advDateTo').val();
     var read = $('input[name=advRadioButtons]:checked').val();
+    $('#advancedSearch').modal('hide');
     $.post('/search',
         {
-            text : searchText,
-            category : category,
-            dateFrom : dateFrom,
-            dateTo : dateTo,
-            read : read
-        }
-    ).done(function(documents) {
-        var table = $("#snytOversigt");
-        var userId = $("#hiddenInput").val();
-        table.html("");
-        for(var i in documents) {
-            var subject = documents[i].subject;
-            //TODO add   var category = documents[i].category; ???
-            var date = documents[i].created.toString().substring(0, 10);
-            var initials = documents[i].user;
-            var read = "//TODO";
-            if(documents[i].readBy) {
-                if(documents[i].readBy.includes(userId)) {
-                    read = "X";
-                } else {
-                    read = "";
-                }
-            }
-            //TODO add   <td>" + category + "</td> ???
-            table.append("<tr class='clickableRow' data-href=" + documents[i]._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
-        }
-        $(".clickableRow").click(function() {
-            window.location = "/snyt/" + $(this).data("href");
+            text: searchText,
+            category: category,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            read: read
         });
-        // if(window.location.pathname != "/") {
-        //     window.location = "/";
-        // }
-    });
-    $('#advancedSearch').modal('hide')
 }
 
-function kvitOversigt() {
-    $.ajax("/search",
-        {
-            method : "GET",
-            success : function(documents) {
-                var table = $("#snytKvitOversigt");
-                table.empty();
-                for(var i in documents) {
-                    var doc = documents[i];
-                    var subject = doc.subject;
-                    //TODO add   var category = doc.category; ???
-                    console.log(doc);
-                    var date = doc.created.toString().substring(0, 10);
-                    var initials = doc.user;
-                    console.log($("#hiddenInputForUserAmount").val());
-                    var read = $("#hiddenInputForUserAmount").val() - doc.readBy.length;
-
-                    //TODO add   <td>" + category + "</td> ???
-                    table.append("<tr class='clickableKvitRow' data-href=" + doc._id + "><td>" + subject + "</td><td>" + date + "</td><td>" + initials + "</td><td>" + read + "</td></tr>");
-                }
-                $(".clickableKvitRow").click(function() {
-                    window.location.href = "/kvit/" + $(this).data("href");
-                });
-            }
-        }
-    );
-    getUserDataKvit();
+function gotoSnyt(row) {
+    var id = $(row).data('href');
+    window.location.href = '/snyt/' + id;
 }
 
-function getUserDataKvit() {
-    console.log($("#kvitListJ").val());
+function gotoSnytKvit(row) {
+    var id = $(row).data('href');
+    window.location.href = '/kvit/' + id;
+}
+
+function goBack() {
+	window.history.back();
 }
 
 //admin CRUD
-
 function findUser(caller) {
 	var user = $(caller).find("a").data("user");
 	$("#editModal").find("#first").val(user.first);
@@ -171,7 +72,7 @@ function findUser(caller) {
 	$("#editModal").find("#password").val(user.password);
 	$("#editModal").find("#id").val(user._id);
 	return user;
-};
+}
 
 function createUser() {
 
@@ -221,9 +122,6 @@ function updateUser() {
 	var email = $("#editModal").find("#email").val();
 	var password = $("#editModal").find("#password").val();
 	var id = $("#editModal").find("#id").val();
-
-	console.log(first);
-	console.log(id);
 
 	// validering
 	if(!first.length > 0) {
