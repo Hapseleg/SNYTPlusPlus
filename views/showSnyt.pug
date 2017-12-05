@@ -27,7 +27,7 @@ block body
                         a(href="/updateSnyt/" + data.snyt._id)
                             button(type="button" class="btn btn-primary") Update SNYT
 
-                        if (data.userHasNotRead)
+                        if (data.notUserRead)
                             li
                             br
                             button(type="submit" class="btn btn-primary") Kvitter
@@ -45,19 +45,19 @@ block body
                         else
                             li
                                 textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
-    if(data.snytHasSubSnyt)
-        each sub in data.subSnytsInSnyt
-            div(class="row")
-                div(class="col-2")
-                    ul(type="none")
-                        li
-                            label Dato
-                                input(type="text" name="snyt[created]" value=sub.created.toLocaleDateString() disabled=true)
+        if(data.hasSubSnyt)
+            each sub in data.subSnytsInSnyt
+                div(class="row")
+                    div(class="col-2")
+                        ul(type="none")
                             li
-                            label Initialer
-                                input(type="text" name="snyt[user]", value=sub.user disabled = true)
+                                label Dato
+                                    input(type="text" name="snyt[created]" value=sub.created.toLocaleDateString() disabled=true)
+                                li
+                                label Initialer
+                                    input(type="text" name="snyt[user]", value=sub.user disabled = true)
 
-                div(class="col-10")
-                    ul(type="none")
-                        li
-                            textarea(rows="10" cols="150" disabled = true name="snyt[text]").form-control=sub.text
+                    div(class="col-10")
+                        ul(type="none")
+                            li
+                                textarea(rows="10" cols="150" disabled = true name="snyt[text]").form-control=sub.text

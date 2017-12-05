@@ -18,6 +18,10 @@ $(document).ready(function() {
             e.preventDefault();
         }
     });
+
+    if(location.pathname == "/") {
+    	advancedSearch();
+	}
 });
 
 function regularSearch() {
@@ -32,11 +36,6 @@ function regularSearch() {
 }
 
 function advancedSearch() {
-    // var category = $('#advCategory option:selected').val();
-    // var searchText = $('#advText').val();
-    // var dateFrom = $('#advDateFrom').val();
-    // var dateTo = $('#advDateTo').val();
-    // var read = $('input[name=advRadioButtons]:checked').val();
 	$('#advSearch').submit();
     $('#advancedSearch').modal('hide');
 }
