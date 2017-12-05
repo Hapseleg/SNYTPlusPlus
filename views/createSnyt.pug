@@ -7,8 +7,7 @@ block body
                     fieldset
                     ul(type="none")
                         li
-                            a(href="/")
-                                button(type="button" class="btn btn-primary") Gå tilbage
+                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
                         li
                         label e-Dok
                             input(type="text" name="snyt[edok]")
@@ -17,13 +16,12 @@ block body
                             input#advDateFrom(type="date" name="snyt[created]" value=data)
                         li
                         label Initialer
-                            input(type="text" name="snyt[user]" disabled="disabled" value=me.initials)
+                            input(type="text" name="snyt[user]" readonly value=me.initials)
                         li
                         label Kategori
                             //input(type="text" name="snyt[category]")
                             select(name="snyt[category]")
-                                //TODO value="ac" -> value="AC"???
-                                option(value="ac") AC
+                                option(value="AC") AC
                                 option(value="Logistik") Logistik
                                 option(value="Tovholder") Tovholder
                                 option(value="Hygiejne") Hygiejne

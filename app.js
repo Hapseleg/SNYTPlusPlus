@@ -200,6 +200,7 @@ app.post('/opretsnyt',function (req,res) {
         message : null,
         data : null
     };
+    console.log(req.body);
     var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
@@ -463,7 +464,7 @@ app.post('/search', function(req, res) {
         message : null,
         data : null
     };
-    // console.log(req.body);
+    console.log(req.body);
     var text = req.body.text;
     var dateFrom = new Date(req.body.dateFrom);
     var dateTo = new Date(req.body.dateTo);
@@ -517,7 +518,6 @@ app.post('/search', function(req, res) {
             returnJson.data = doc;
             returnJson.message = "Success";
         }
-        // console.log(returnJson);
         res.render('index', returnJson);
     });
 });
