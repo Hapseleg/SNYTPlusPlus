@@ -232,6 +232,8 @@ app.post('/opretsnyt',function (req,res) {
     });
 });
 app.get('/updateSnyt/:id', function (req,res) {
+    //mangler sikkerhed: man kan stadig bypass ved at gå på url'en (altså hvis man ikke er den bruger der har oprettet SNYT'en) men vi synes ikke det er nødvendigt..
+
     var returnJson = {
         errors : [],
         message : null,
@@ -258,6 +260,7 @@ app.get('/updateSnyt/:id', function (req,res) {
 
     res.render('updateSnyt', returnJson);
 });
+
 app.post('/updateSnyt/:id',function (req,res) {
     var returnJson = {
         errors : [],
@@ -350,23 +353,30 @@ app.post('/editSnyt',function (req, res) {
         message : null,
         data : null
     };
-    var newSnyt = new Snyt();
-    newSnyt.subject = req.body.snyt.subject;
-    newSnyt.category = req.body.snyt.category;
-    newSnyt.text = req.body.snyt.text;
-    newSnyt.user = req.body.snyt.user;
-    newSnyt.created = req.body.snyt.created;
-    newSnyt.edok = req.body.snyt.edok;
-    newSnyt._id = req.body.snyt._id;
 
-    Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
-        returnJson.data = [].push(doc);
-        console.log(returnJson.data);
-        res.render('index', returnJson);
-    }).catch(function (err) {
-        returnJson.errors.push(err);
-        res.render('index', returnJson);
-    });
+    //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
+    if(res.locals.me.initials == doc.user){
+        var newSnyt = new Snyt();
+        newSnyt.subject = req.body.snyt.subject;
+        newSnyt.category = req.body.snyt.category;
+        newSnyt.text = req.body.snyt.text;
+        newSnyt.user = req.body.snyt.user;
+        newSnyt.created = req.body.snyt.created;
+        newSnyt.edok = req.body.snyt.edok;
+        newSnyt._id = req.body.snyt._id;
+
+        Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
+            returnJson.data = [].push(doc);
+            console.log(returnJson.data);
+            res.render('index', returnJson);
+        }).catch(function (err) {
+            returnJson.errors.push(err);
+            res.render('index', returnJson);
+        });
+    }
+    else{
+        res.redirect('/');
+    }
 });
 
 /*
@@ -379,26 +389,31 @@ app.get('/editSnyt/:id',function (req, res) {
         data : null
     };
     Snyt.findById(req.params.id).exec().then(function(doc) {
+        //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
+        if(res.locals.me.initials == doc.user){
+            //fix dato
+            let yyyy = doc.created.getFullYear();
+            let mm = doc.created.getMonth()+1;
+            let dd = doc.created.getDate();
 
-        //fix dato
-        let yyyy = doc.created.getFullYear();
-        let mm = doc.created.getMonth()+1;
-        let dd = doc.created.getDate();
+            // console.log("DAAAY" + dd);
 
-        // console.log("DAAAY" + dd);
-
-        if(dd<10){
-            dd='0'+dd;
+            if(dd<10){
+                dd='0'+dd;
+            }
+            if(mm<10){
+                mm='0'+mm;
+            }
+            doc.createdDate = yyyy+"-"+mm+"-"+dd;
+            returnJson.data = doc;
+            res.render('editSnyt', returnJson);
         }
-        if(mm<10){
-            mm='0'+mm;
+        else{
+            res.redirect('/');
         }
-        doc.createdDate = yyyy+"-"+mm+"-"+dd;
-        returnJson.data = doc;
-        res.render('editSnyt', returnJson);
     }).catch(function (err) {
         returnJson.errors.push(err);
-        res.render('editSnyt', returnJson);
+        res.render('index', returnJson);
     });
 });
 
