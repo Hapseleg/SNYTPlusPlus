@@ -87,7 +87,7 @@ app.use(function(req,res,next){
                 }
                 else{
                     res.locals.me = doc;
-                    next()
+                    next();
                 }
             })
     }
@@ -130,18 +130,24 @@ app.get('/',function (req,res) {
  * else create UNF page
  */
 app.post('/',function (req,res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     User.findOne({email: req.body.user.email, password: req.body.user.password}, function (err,doc) {
         if(err){
-            return next(err)
+            returnJson.errors.push(err);
         }
         else if(!doc){
-            return res.send('<p>User not found</p>');
+            returnJson.errors.push(new Error("Bruger ikke fundet"));
+            returnJson.message = "Failed";
         }
         else{
             req.session.loggedIn = doc._id;
-            // res.send(doc);
-            res.redirect('/');
+            returnJson.message = "Success";
         }
+        res.render('index', returnJson);
     });
 });
 
@@ -160,6 +166,11 @@ app.get('/logout',function (req,res) {
  * Render create snyt screen
  */
 app.get('/opretsnyt', function (req,res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     let today = new Date();
     let yyyy = today.getFullYear();
     let mm = today.getMonth()+1;
@@ -172,9 +183,9 @@ app.get('/opretsnyt', function (req,res) {
         mm='0'+mm;
     }
 
-    var todayString = yyyy+"-"+mm+"-"+dd;
+    returnJson.data = yyyy+"-"+mm+"-"+dd;
 
-    res.render('createSnyt', {date: todayString});
+    res.render('createSnyt', returnJson);
 });
 
 /*
@@ -184,6 +195,11 @@ app.get('/opretsnyt', function (req,res) {
  * Then redirect to /
  */
 app.post('/opretsnyt',function (req,res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
@@ -206,13 +222,23 @@ app.post('/opretsnyt',function (req,res) {
 
     newSnyt.save(function (err, snyt) {
        if(err){
-           res.send('Error:'+err.toString());
+           returnJson.errors.push(err);
+           returnJson.message = "Failed";
+       } else {
+           returnJson.message = "Success";
        }
-       // console.log(snyt.notReadBy);
+       res.render('index', returnJson);
     });
-    res.redirect('/');
 });
 app.get('/updateSnyt/:id', function (req,res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            snytid : null,
+            date : null
+        }
+    };
     let today = new Date();
     let yyyy = today.getFullYear();
     let mm = today.getMonth()+1;
@@ -225,12 +251,18 @@ app.get('/updateSnyt/:id', function (req,res) {
         mm='0'+mm;
     }
 
-    var todayString = yyyy+"-"+mm+"-"+dd;
+    returnJson.data.date = yyyy+"-"+mm+"-"+dd;
+    returnJson.data.snytid = req.params.id;
 
 
-    res.render('updateSnyt', {snytid: req.params.id, date: todayString});
+    res.render('updateSnyt', returnJson);
 });
 app.post('/updateSnyt/:id',function (req,res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     var newsubsnyt = new SubSnyt();
     newsubsnyt.text = req.body.subsnyt.text;
     newsubsnyt.user = req.body.subsnyt.user;
@@ -238,57 +270,66 @@ app.post('/updateSnyt/:id',function (req,res) {
 
     newsubsnyt.save(function (err, subsnyt) {
         if(err){
-            res.send('Error:'+err.toString());
+            returnJson.errors.push(err);
         }
 
-        // console.log("IDDDDDDDDD: "+subsnyt.id);
         Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id }})
             .catch(function (err) {
-                console.log(err);
-                res.send('\n \n Error:' + err.toString());
+                returnJson.errors.push(err);
+                res.render('index', returnJson);
             });
     });
-    res.redirect('/');
 });
 
 /*
  * SNYT Read and mark as læsekvitteret routes
  */
 app.route('/snyt/:id').get(function (req, res) {
-    let userID = req.session.loggedIn;
-    let notUserRead = true;
-    let hasSubSnyt = false;
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            userID : req.session.loggedIn,
+            notUserRead : true,
+            hasSubSnyt : false,
+            snyt : null,
+            subSnytsInSnyt : null
+        }
+    };
     Snyt.findById(req.params.id).exec().then(function(doc) {
-        if(doc.readBy.includes(userID)){
-            notUserRead = false;
+        if(doc.readBy.includes(returnJson.data.userID)){
+            returnJson.data.notUserRead = false;
         }
         if(doc.idSubSnyts.length>0){
-            hasSubSnyt = true;
+            returnJson.data.hasSubSnyt = true;
         }
-
         SubSnyt.find({"$or":[{"_id":doc.idSubSnyts}]}).exec(function (err, subdoc) {
             if(err){
-                throw err;
+                returnJson.errors.push(err);
             }
-            res.render('showSnyt', {snyt: doc, userHasNotRead: notUserRead, snytHasSubSnyt : hasSubSnyt, subSnytsInSnyt : subdoc});
+            returnJson.data.subSnytsInSnyt = subdoc;
+            returnJson.data.snyt = doc;
+            res.render('showSnyt', returnJson);
         });
     }).catch(function (err) {
-        console.log('du er blevet snyt hehe (: \n'+err);
-        res.send('Error:' + err.toString());
+        returnJson.errors.push(err);
+        res.render('showSnyt', returnJson);
     });
 });
 
 
 // POST -  Mark a SNYT as læsekvitteret -> redirect to /
 app.post('/snyt/:id',function (req,res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     let userID = req.session.loggedIn;
-    // console.log("her er lorten");
-    // console.log(req.params.id);
     Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {readBy: userID}})
         // .exec()
         .catch(function (err) {
-            console.log('du er blevet snyt hehe (: \n'+err);
-            res.send('\n \n Error:' + err.toString());
+            returnJson.errors.push(err);
         });
     // Snyt.findOne({_id: req.params.id}).exec().then(function (doc) {
     //     console.log(doc.readBy);
@@ -296,13 +337,18 @@ app.post('/snyt/:id',function (req,res) {
     //     console.log('\n mere snyt \n' + err);
     // });
 
-    res.redirect('/');
+    res.render('index', returnJson);
 });
 
 /*
  *
  */
 app.post('/editSnyt',function (req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
@@ -313,11 +359,12 @@ app.post('/editSnyt',function (req, res) {
     newSnyt._id = req.body.snyt._id;
 
     Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
-
-
-        res.render('showSnyt',{snyt:doc});
+        returnJson.data = [].push(doc);
+        console.log(returnJson.data);
+        res.render('index', returnJson);
     }).catch(function (err) {
-        console.log(err);
+        returnJson.errors.push(err);
+        res.render('index', returnJson);
     });
 });
 
@@ -325,6 +372,11 @@ app.post('/editSnyt',function (req, res) {
  *
  */
 app.get('/editSnyt/:id',function (req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     Snyt.findById(req.params.id).exec().then(function(doc) {
 
         //fix dato
@@ -341,12 +393,11 @@ app.get('/editSnyt/:id',function (req, res) {
             mm='0'+mm;
         }
         doc.createdDate = yyyy+"-"+mm+"-"+dd;
-
-        res.render('editSnyt', {snyt: doc});
-        // console.log(doc);
+        returnJson.data = doc;
+        res.render('editSnyt', returnJson);
     }).catch(function (err) {
-        console.log(err);
-        res.send('Error:' + err.toString());
+        returnJson.errors.push(err);
+        res.render('editSnyt', returnJson);
     });
 });
 
@@ -412,6 +463,7 @@ app.post('/search', function(req, res) {
         message : null,
         data : null
     };
+    // console.log(req.body);
     var text = req.body.text;
     var dateFrom = new Date(req.body.dateFrom);
     var dateTo = new Date(req.body.dateTo);
@@ -465,12 +517,26 @@ app.post('/search', function(req, res) {
             returnJson.data = doc;
             returnJson.message = "Success";
         }
+        // console.log(returnJson);
         res.render('index', returnJson);
     });
 });
 
 //----------------------------------------------
 // Admin routes
+
+/*
+ * Login som admin
+ */
+app.post('/admin/login', function(req, res) {
+    var adminUsername = "administrator";
+    var adminPassword = "pokemon";
+
+    if(req.body.adminUsername == adminUsername && req.body.adminPassword == adminPassword) {
+        req.session.adminLoggedIn = "thisIsAdmin";
+    }
+    res.redirect('/admin');
+});
 
 /*
  * Get admin side (login side hvis man ikke er authenticated)
@@ -492,6 +558,7 @@ app.get('/admin', function(req, res) {
         if(err) {
             returnJson.errors.push(err);
         }
+        console.log(returnJson.errors);
         res.render('admin', returnJson);
     });
 });
@@ -547,6 +614,24 @@ app.post('/admin', function(req, res) {
     });
 
     res.render('admin', returnJson);
+});
+
+/*
+ * Hjælpefunktion til at få ID på en bruger med email og password i POST
+ */
+app.post('/admin/user', function(req, res) {
+    var email = req.body.email;
+    var password = req.body.password;
+
+    User.findOne({"email" : email, "password" : password}).exec(function(err, doc) {
+        if(!doc) {
+            res.json(new Error("Ingen bruger"));
+        }
+        if(err) {
+            res.json(err);
+        }
+        res.json(doc._id);
+    });
 });
 
 /*
@@ -608,19 +693,6 @@ app.delete('/admin', function(req, res) {
 });
 
 /*
- * Login som admin
- */
-app.post('/admin/login', function(req, res) {
-    var adminUsername = "administrator";
-    var adminPassword = "pokemon";
-
-    if(req.body.adminUsername == adminUsername && req.body.adminPassword == adminPassword) {
-        req.session.adminLoggedIn = "thisIsAdmin";
-    }
-    res.redirect('/admin');
-});
-
-/*
  * Log out as admin
  */
 app.get('/admin/logout', function(req, res) {
@@ -628,23 +700,7 @@ app.get('/admin/logout', function(req, res) {
     res.redirect('/admin');
 });
 
-/*
- * Hjælpefunktion til at få ID på en bruger med email og password i POST
- */
-app.post('/admin/user', function(req, res) {
-    var email = req.body.email;
-    var password = req.body.password;
 
-    User.findOne({"email" : email, "password" : password}).exec(function(err, doc) {
-        if(!doc) {
-           res.json(new Error("Ingen bruger"));
-        }
-        if(err) {
-            res.json(err);
-        }
-        res.json(doc._id);
-    });
-});
 
 /*
 * Helper method to get all users

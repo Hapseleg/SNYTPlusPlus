@@ -52,9 +52,9 @@ html
                             button.btn.btn-primary(type='button' onclick="createUser()") Opret
             br
 
-            if !errors
+            if errors.length == 0
                 ul(class="user-list")
-                    each user in allUsers
+                    each user in data
                         li(class="nodecoration" onclick="findUser(this);")
                             a.list-group-item.list-group-item-action(href="#" data-toggle="modal"
                             data-target="#editModal" data-user=user) #{user.first}

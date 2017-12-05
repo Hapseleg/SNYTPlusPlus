@@ -12,13 +12,15 @@ block body
                         th Læst
                 tbody#snytOversigt
                     if data
+                        p data
+                        p hej
                         each snyt in data
                             tr.clickableRow(data-href=snyt._id onclick='gotoSnyt(this)')
                                 td #{snyt.subject}
                                 td #{snyt.category}
                                 td #{snyt.created.toLocaleDateString()}
                                 td #{snyt.user}
-                                if ( snyt.readBy.indexOf(me._id) > 0 )
+                                if ( snyt.readBy.indexOf(me._id) >= 0 )
                                     td  X
                                 else
                                     td
