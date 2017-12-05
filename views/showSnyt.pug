@@ -1,13 +1,11 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/snyt/"+data.snyt._id, method="POST")
+        form(action="/snyt/" + data.snyt._id, method="POST")
             div(class="row")
                 div(class="col-2")
                     fieldset
                     ul(type="none")
-                        li
-                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
                         li
                         a(name="snyt[edok]" href=data.snyt.edok) e-Dok
                         li
@@ -26,7 +24,11 @@ block body
                         br
                         a(href="/updateSnyt/" + data.snyt._id)
                             button(type="button" class="btn btn-primary") Update SNYT
-
+                        br
+                        br
+                        li
+                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
+                        br
                         if (data.userHasNotRead)
                             li
                             br
@@ -38,7 +40,8 @@ block body
                 div(class="col-10")
                     ul(type="none")
                         li
-                            input(type="text" name="snyt[subject]" value=data.snyt.subject disabled = true style="width: 1073px;")
+                            label Emne
+                                input(type="text" name="snyt[subject]" value=data.snyt.subject disabled = true style="width: 1073px;")
                         if(data.snytHasSubSnyt)
                             li
                                 textarea(rows="15" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text

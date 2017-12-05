@@ -7,8 +7,6 @@ block body
                     fieldset
                     ul(type="none")
                         li
-                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
-                        li
                         label e-Dok
                             input(type="text" name="snyt[edok]")
                         li
@@ -34,11 +32,15 @@ block body
 
                         li
                             button(type="submit" class="btn btn-primary") Gem
+                        br
+                        li
+                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
 
 
                 div(class="col-10")
                     ul(type="none")
                         li
-                            input(type="text" name="snyt[subject]" style="width: 1073px;")
+                            label Emne
+                                input(type="text" name="snyt[subject]" style="width: 1073px;")
                         li
                             textarea(name="snyt[text]" rows="20" cols="150")
