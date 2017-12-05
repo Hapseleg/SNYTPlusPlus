@@ -265,7 +265,9 @@ app.post('/updateSnyt/:id',function (req,res) {
     var returnJson = {
         errors : [],
         message : null,
-        data : null
+        data : {
+            snyt : null
+        }
     };
     var newsubsnyt = new SubSnyt();
     newsubsnyt.text = req.body.subsnyt.text;
@@ -277,11 +279,13 @@ app.post('/updateSnyt/:id',function (req,res) {
             returnJson.errors.push(err);
         }
 
-        Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id }})
-            .catch(function (err) {
-                returnJson.errors.push(err);
-                res.render('index', returnJson);
-            });
+        Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id }}).exec(function(err, doc) {
+            res.redirect("/snyt/" + req.params.id);
+        })
+        .catch(function (err) {
+            returnJson.errors.push(err);
+            res.render('showSnyt', returnJson);
+        });
     });
 });
 
@@ -341,7 +345,7 @@ app.post('/snyt/:id',function (req,res) {
     //     console.log('\n mere snyt \n' + err);
     // });
 
-    res.render('index', returnJson);
+    res.redirect('/snyt/' + req.params.id);
 });
 
 /*
@@ -351,7 +355,9 @@ app.post('/editSnyt',function (req, res) {
     var returnJson = {
         errors : [],
         message : null,
-        data : null
+        data : {
+            snyt : null
+        }
     };
 
     //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
@@ -365,18 +371,12 @@ app.post('/editSnyt',function (req, res) {
         newSnyt.edok = req.body.snyt.edok;
         newSnyt._id = req.body.snyt._id;
 
-        Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
-            returnJson.data = [].push(doc);
-            console.log(returnJson.data);
-            res.render('index', returnJson);
-        }).catch(function (err) {
-            returnJson.errors.push(err);
-            res.render('index', returnJson);
-        });
-    }
-    else{
-        res.redirect('/');
-    }
+    Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
+        res.redirect('/snyt/' + req.body.snyt._id);
+    }).catch(function (err) {
+        returnJson.errors.push(err);
+        res.render('showSnyt', returnJson);
+    });
 });
 
 /*
@@ -479,7 +479,6 @@ app.post('/search', function(req, res) {
         message : null,
         data : null
     };
-    console.log(req.body);
     var text = req.body.text;
     var dateFrom = new Date(req.body.dateFrom);
     var dateTo = new Date(req.body.dateTo);
@@ -488,7 +487,7 @@ app.post('/search', function(req, res) {
     dateTo.setSeconds(59);
     dateFrom = dateFrom.toISOString();
     dateTo = dateTo.toISOString();
-    var read = req.body.read;
+    var read = req.body.advRadioButtons;
     var category = req.body.category;
     var regExText = new RegExp(".*" + text + ".*", "i");
     var readOption = {};
