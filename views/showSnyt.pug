@@ -1,7 +1,7 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/snyt/"+snyt._id, method="POST")
+        form(action="/snyt/"+data.snyt._id, method="POST")
             div(class="row")
                 div(class="col-2")
                     fieldset
@@ -9,25 +9,25 @@ block body
                         li
                             button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
                         li
-                        a(name="snyt[edok]" href=snyt.edok) e-Dok
+                        a(name="snyt[edok]" href=data.snyt.edok) e-Dok
                         li
                         label Dato
-                            input(type="text" name="snyt[created]" value=snyt.created.toLocaleDateString() disabled=true)
+                            input(type="text" name="snyt[created]" value=data.snyt.created.toLocaleDateString() disabled=true)
                         li
                         label Initialer
-                            input(type="text" name="snyt[user]", value=snyt.user disabled = true)
+                            input(type="text" name="snyt[user]", value=data.snyt.user disabled = true)
                         li
                         label Kategori
-                            input(type="text" name="snyt[category]" value=snyt.category disabled = true)
+                            input(type="text" name="snyt[category]" value=data.snyt.category disabled = true)
                         li
-                        a(href="/editsnyt/" + snyt._id)
+                        a(href="/editsnyt/" + data.snyt._id)
                             button(type="button" class="btn btn-primary") Rediger SNYT
                         li
                         br
-                        a(href="/updateSnyt/" + snyt._id)
+                        a(href="/updateSnyt/" + data.snyt._id)
                             button(type="button" class="btn btn-primary") Update SNYT
 
-                        if (userHasNotRead)
+                        if (data.userHasNotRead)
                             li
                             br
                             button(type="submit" class="btn btn-primary") Kvitter
@@ -38,15 +38,15 @@ block body
                 div(class="col-10")
                     ul(type="none")
                         li
-                            input(type="text" name="snyt[subject]" value=snyt.subject disabled = true style="width: 1073px;")
-                        if(snytHasSubSnyt)
+                            input(type="text" name="snyt[subject]" value=data.snyt.subject disabled = true style="width: 1073px;")
+                        if(data.snytHasSubSnyt)
                             li
-                                textarea(rows="15" cols="150" disabled = true name="snyt[text]").form-control=snyt.text
+                                textarea(rows="15" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
                         else
                             li
-                                textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=snyt.text
-    if(snytHasSubSnyt)
-        each sub in subSnytsInSnyt
+                                textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
+    if(data.snytHasSubSnyt)
+        each sub in data.subSnytsInSnyt
             div(class="row")
                 div(class="col-2")
                     ul(type="none")

@@ -7,17 +7,17 @@ block body
                     fieldset
                     ul(type="none")
                         li
-                            a(href="/snyt/"+snyt.id)
+                            a(href="/snyt/"+data.id)
                                 button(type="button" class="btn btn-primary") Gå tilbage
                         li
                             label e-Dok
-                                input(type="text" name="snyt[edok]" value=snyt.edok)
+                                input(type="text" name="snyt[edok]" value=data.edok)
                         li
                         label Dato
-                            input(type="date" name="snyt[created]" value=snyt.createdDate)
+                            input(type="date" name="snyt[created]" value=data.createdDate)
                         li
                         label Initialer
-                            input(type="text" name="snyt[user]", value=snyt.user)
+                            input(type="text" name="snyt[user]", value=data.user)
                         li
                         label Kategori
                         div(class="cats")
@@ -34,16 +34,16 @@ block body
                         li
                             button(type="submit" class="btn btn-primary") OK
 
-                        input(type="text" name="snyt[_id]" value=snyt._id hidden)
+                        input(type="text" name="snyt[_id]" value=data._id hidden)
 
                 div(class="col-10")
                     ul(type="none")
                         li
-                            input(type="text" name="snyt[subject]" value=snyt.subject style="width: 1073px;")
+                            input(type="text" name="snyt[subject]" value=data.subject style="width: 1073px;")
                         li
-                            textarea(rows="20" cols="150" name="snyt[text]").form-control=snyt.text
+                            textarea(rows="20" cols="150" name="snyt[text]").form-control=data.text
 
     script.
         $(document).ready(function () {
-            $('option[value="#{snyt.category}"]').prop("selected", true);
+            $('option[value="#{data.category}"]').prop("selected", true);
         })

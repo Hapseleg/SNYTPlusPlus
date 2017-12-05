@@ -1,24 +1,23 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/updateSnyt/"+snytid, method="POST")
+        form(action="/updateSnyt/"+data.snytid, method="POST")
             div(class="row")
                 div(class="col-2")
                     fieldset
                     ul(type="none")
                         li
-                            a(href="/snyt/"+snytid)
-                                button(type="button" class="btn btn-primary") Gå tilbage
+                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
                         li
                         label Dato
-                            input(type="date" name="subsnyt[created]" value=date)
+                            input(type="date" name="subsnyt[created]" value=data.date)
                         li
                         label Initialer
                             input(type="text" name="snyt[user]" disabled="disabled" value=me.initials)
 
                         li
                             button(type="submit" class="btn btn-primary") OK
-                        input(type="text" name="subsnyt[_id]" value=snytid hidden)
+                        input(type="text" name="subsnyt[_id]" value=data.snytid hidden)
 
                 div(class="col-10")
                     ul(type="none")
