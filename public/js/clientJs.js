@@ -32,20 +32,13 @@ function regularSearch() {
 }
 
 function advancedSearch() {
-    var category = $('#advCategory option:selected').val();
-    var searchText = $('#advText').val();
-    var dateFrom = $('#advDateFrom').val();
-    var dateTo = $('#advDateTo').val();
-    var read = $('input[name=advRadioButtons]:checked').val();
+    // var category = $('#advCategory option:selected').val();
+    // var searchText = $('#advText').val();
+    // var dateFrom = $('#advDateFrom').val();
+    // var dateTo = $('#advDateTo').val();
+    // var read = $('input[name=advRadioButtons]:checked').val();
+	$('#advSearch').submit();
     $('#advancedSearch').modal('hide');
-    $.post('/search',
-        {
-            text: searchText,
-            category: category,
-            dateFrom: dateFrom,
-            dateTo: dateTo,
-            read: read
-        });
 }
 
 function gotoSnyt(row) {

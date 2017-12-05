@@ -7,8 +7,7 @@ block body
                     fieldset
                     ul(type="none")
                         li
-                            a(href="/snyt/"+data.id)
-                                button(type="button" class="btn btn-primary") Gå tilbage
+                            button(type="button" class="btn btn-primary" onclicl="goBack();") Gå tilbage
                         li
                             label e-Dok
                                 input(type="text" name="snyt[edok]" value=data.edok)

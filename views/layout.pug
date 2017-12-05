@@ -48,26 +48,25 @@ html
                         button(type="button" class="close" data-dismiss="modal" aria-label="Close")
                             span(aria-hidden="true") &times;
                     div(class="modal-body")
-                        form(id="advSearch")
+                        form(id="advSearch" action="/search" method="POST")
                             label(for="advCategory") Kategori
                             br
-                            select(id="advCategory")
+                            select(id="advCategory" form="advSearch" name="category")
                                 option(value="" selected="true")
-                                //TODO value="ac" -> value="AC"???
-                                option(value="ac") AC
-                                option(value="logistik") Logistik
-                                option(value="tovholder") Tovholder
-                                option(value="hygiejne") Hygiejne
-                                option(value="levering") Levering
-                                option(value="reklamation") Reklamation
-                                option(value="it") IT
-                                option(value="klinisk") Klinisk Forsøg
-                                option(value="produktion") Produktion
+                                option(value="AC") AC
+                                option(value="Logistik") Logistik
+                                option(value="Tovholder") Tovholder
+                                option(value="Hygiejne") Hygiejne
+                                option(value="Levering") Levering
+                                option(value="Reklamation") Reklamation
+                                option(value="IT") IT
+                                option(value="Klinisk Forsøg") Klinisk Forsøg
+                                option(value="Produktion") Produktion
                             br
                             br
                             label(for="advText") Søgeord
                             br
-                            input#advText(type="text")
+                            input#advText(type="text" form="advSearch" name="text")
                             br
                             br
                             table#advDateTable
@@ -76,24 +75,24 @@ html
                                     th Dato Til
                                 tr
                                     td
-                                        input#advDateFrom(type="date")
+                                        input#advDateFrom(type="date" form="advSearch" name="dateFrom")
                                     td
-                                        input#advDateTo(type="date")
+                                        input#advDateTo(type="date" form="advSearch" name="dateTo")
                             br
                             br
 
-                            input#advRadio1(type="radio" name="advRadioButtons" value="true" style="margin-right: 10px")
+                            input#advRadio1(type="radio" name="advRadioButtons" value="true" style="margin-right: 10px" form="advSearch")
                             label(for="advRadio1") Læsekvitteret
                             br
-                            input#advRadio2(type="radio" name="advRadioButtons" value="false" style="margin-right: 10px")
+                            input#advRadio2(type="radio" name="advRadioButtons" value="false" style="margin-right: 10px" form="advSearch")
                             label(for="advRadio2") Ikke Læsekvitteret
                             br
-                            input#advRadio3(type="radio" name="advRadioButtons" style="margin-right: 10px" checked="checked")
+                            input#advRadio3(type="radio" name="advRadioButtons" style="margin-right: 10px" checked="checked" form="advSearch")
                             label(for="advRadio3") Alle
                             br
 
                     div(class="modal-footer")
-                        button(type="button" class="btn btn-primary" onClick="advancedSearch();") Søg
+                        button(type="button" class="btn btn-primary" onClick="advancedSearch();" form="advSearch") Søg
                         button(type="button" class="btn btn-secondary" data-dismiss="modal") Luk
         if errors
             if errors.length > 0
