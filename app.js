@@ -357,12 +357,24 @@ app.get('/editSnyt/:id',function (req, res) {
  * Alle snyt
  */
 app.get('/search', function(req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
+
     Snyt.find({}).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
-            throw err;
-        } else {
-            res.json(doc);
+            returnJson.errors.push(err);
         }
+        if(!doc) {
+            returnJson.errors.push(new Error("Ingen bruger"));
+            returnJson.message = "Failed";
+        } else {
+            returnJson.data = doc;
+            returnJson.message = "Success";
+        }
+        res.render('index', returnJson);
     });
 });
 
@@ -370,13 +382,24 @@ app.get('/search', function(req, res) {
  * Almindelig søgning
  */
 app.get('/search/:text', function(req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     var reg = new RegExp(".*" + req.params.text + ".*", "i");
     Snyt.find({"$or":[{"subject": reg}, {"text": reg}]}).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
-            throw err;
-        } else {
-            res.json(doc);
+            returnJson.errors.push(err);
         }
+        if(!doc) {
+            returnJson.errors.push(new Error("Ingen bruger"));
+            returnJson.message = "Failed";
+        } else {
+            returnJson.data = doc;
+            returnJson.message = "Success";
+        }
+        res.render('index', returnJson);
     });
 });
 
@@ -384,6 +407,11 @@ app.get('/search/:text', function(req, res) {
  * Avanceret søgning
  */
 app.post('/search', function(req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     var text = req.body.text;
     var dateFrom = new Date(req.body.dateFrom);
     var dateTo = new Date(req.body.dateTo);
@@ -428,10 +456,16 @@ app.post('/search', function(req, res) {
             ]
         }).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
-            console.log(err);
-        } else {
-            res.json(doc);
+            returnJson.errors.push(err);
         }
+        if(!doc) {
+            returnJson.errors.push(new Error("Ingen bruger"));
+            returnJson.message = "Failed";
+        } else {
+            returnJson.data = doc;
+            returnJson.message = "Success";
+        }
+        res.render('index', returnJson);
     });
 });
 
@@ -442,18 +476,23 @@ app.post('/search', function(req, res) {
  * Get admin side (login side hvis man ikke er authenticated)
  */
 app.get('/admin', function(req, res) {
-    var allUsers = null;
-    var errors = null;
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     User.find({}).exec(function(err, doc) {
         if(doc) {
-            allUsers = doc;
+            returnJson.data = doc;
+            returnJson.message = "Success";
         } else {
-            error = "Der skete en fejl, prøv at genindlæse siden"
+            returnJson.errors.push(new Error("Der skete en fejl, prøv at genindlæse siden"));
+            returnJson.message = "Failed";
         }
         if(err) {
-            error = err;
+            returnJson.errors.push(err);
         }
-        res.render('admin', {allUsers : allUsers, errors : errors});
+        res.render('admin', returnJson);
     });
 });
 
@@ -461,21 +500,25 @@ app.get('/admin', function(req, res) {
  * Opret ny bruger i systemet
  */
 app.post('/admin', function(req, res) {
-    var errors = [];
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
     User.find({"email" : req.body.user.email}).exec(function(err, doc) {
         if(err) {
-            errors.push(err);
+           returnJson. errors.push(err);
         }
         if(doc) {
-            errors.push("Bruger med denne email eksisterer allerede");
+            returnJson.errors.push(new Error("Bruger med denne email eksisterer allerede"));
         }
     });
     User.find({"initials" : req.body.user.initials}).exec(function(err, doc) {
         if(err) {
-            errors.push(err);
+            returnJson.errors.push(err);
         }
         if(doc) {
-            errors.push("Bruger med disse initialer eksisterer allerede");
+            returnJson.errors.push(new Error("Bruger med disse initialer eksisterer allerede"));
         }
     });
     if(errors.length > 0) {
@@ -499,11 +542,11 @@ app.post('/admin', function(req, res) {
 
     newUser.save(function (err, user) {
         if(err){
-            res.send('Error:'+err.toString());
+            returnJson.errors.push(new Error("Kunne ikke gemme"));
         }
     });
 
-    res.redirect('/admin');
+    res.render('admin', returnJson);
 });
 
 /*
@@ -545,6 +588,11 @@ app.post('/admin/:userid', function(req, res) {
  * Slet en bruger
  */
 app.delete('/admin', function(req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
 
     // var removeOldUserFromAllSnyts = function() {
     //     Snyt.find().exec().then(function (snyt) {
@@ -556,7 +604,7 @@ app.delete('/admin', function(req, res) {
     // }();
 
     User.find({"_id" : mongoose.Types.ObjectId(req.body.id)}).remove().exec();
-    res.render('admin');
+    res.render('admin', returnJson);
 });
 
 /*
@@ -589,10 +637,10 @@ app.post('/admin/user', function(req, res) {
 
     User.findOne({"email" : email, "password" : password}).exec(function(err, doc) {
         if(!doc) {
-            throw new Error("Ingen bruger");
+           res.json(new Error("Ingen bruger"));
         }
         if(err) {
-            throw err;
+            res.json(err);
         }
         res.json(doc._id);
     });
@@ -616,37 +664,69 @@ app.get('/admin/users', function(req, res) {
 });
 
 app.get('/kvitoversigt', function(req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            userCount : null,
+            snyt : null
+        }
+    };
     User.find().exec(function(err, doc) {
        if(err) {
-           res.json(err);
+           returnJson.errors.push(err);
        }
        if(!doc) {
-           res.json("Nope");
+           returnJson.errors.push(new Error("Nope"));
+           returnJson.message = "Failed";
        }
        if(doc) {
-           res.render('kvitoversigt', {users: doc.length});
+           returnJson.message = "Success";
+           returnJson.data.userCount = doc.length;
+           Snyt.find({}).sort({"created" : -1}).exec(function(err, docs) {
+               if(err) {
+                   returnJson.errors.push(err);
+               }
+               if(!doc) {
+                   returnJson.errors.push(new Error("Nope"));
+                   returnJson.message = "Failed";
+               }
+               if(doc) {
+                   returnJson.message = "Success";
+                   returnJson.data.snyt = docs;
+                   res.render('kvitoversigt', returnJson);
+               }
+           });
        }
     });
 });
 
 app.get("/kvit/:id", function(req, res) {
-    let allUsersExcept = null;
-    let snyt = null;
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            allUsersExcept : null,
+            snyt : null
+        }
+    };
     Snyt.findById(req.params.id).exec(function(err, doc) {
         if(err) {
-            res.json(err);
+            returnJson.errors.push(err);
         }
         if(!doc) {
-            res.json("Nope");
+            returnJson.errors.push(new Error("Nope"));
+            returnJson.message = "Failed";
+            res.render('showKvit', returnJson);
         }
         if(doc) {
-            snyt = doc;
+            returnJson.data.snyt = doc;
             rp.get("http://localhost:1337/admin/users")
                 .then(function(json) {
-                    allUsersExcept = JSON.parse(json).filter(function(elem) {
-                        return snyt.readBy.indexOf(elem._id) == -1;
+                   returnJson.data.allUsersExcept = JSON.parse(json).filter(function(elem) {
+                        return returnJson.data.snyt.readBy.indexOf(elem._id) == -1;
                     });
-                    res.render('showKvit', {snyt : snyt, users : allUsersExcept});
+                   res.render('showKvit', returnJson);
                 });
         }
     });
