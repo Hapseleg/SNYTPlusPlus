@@ -20,13 +20,18 @@ block body
                         li
                         label Kategori
                             input(type="text" name="snyt[category]" value=snyt.category disabled = true)
-                        li
-                        a(href="/editsnyt/" + snyt._id)
-                            button(type="button" class="btn btn-primary") Rediger SNYT
-                        li
-                        br
-                        a(href="/updateSnyt/" + snyt._id)
-                            button(type="button" class="btn btn-primary") Update SNYT
+                        li me
+                        li=me.initials
+                        li snyt
+                        li=snyt.user
+                        if(me.initials.toString() == snyt.user)
+                            li
+                            a(href="/editsnyt/" + snyt._id)
+                                button(type="button" class="btn btn-primary") Rediger SNYT
+                            li
+                            br
+                            a(href="/updateSnyt/" + snyt._id)
+                                button(type="button" class="btn btn-primary") Update SNYT
 
                         if (userHasNotRead)
                             li

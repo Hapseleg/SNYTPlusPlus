@@ -9,6 +9,9 @@ block body
                         a(href="/kvitoversigt")
                             button(type="button" class="btn btn-primary") Gå tilbage
                     li
+                        a(href="/snyt/" + snyt.id)
+                            button(type="button" class="btn btn-primary") Gå til SNYT
+                    li
                     a(name="snyt[edok]" href=snyt.edok) e-Dok
                     li
                     label Dato
