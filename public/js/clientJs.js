@@ -4,24 +4,25 @@ $(document).ready(function() {
 	var monthNow = ('0' + (now.getMonth() + 1)).slice(-2);
 	var today = now.getFullYear() + '-' + (monthNow) + '-' + (dayNow);
 	$('#advDateTo').val(today);
-	
+
 	var before = new Date();
 	before.setMonth(before.getMonth() - 2);
 	var dayBefore = ('0' + before.getDate()).slice(-2);
 	var monthBefore = ('0' + (before.getMonth() + 1)).slice(-2);
 	var dateBefore = before.getFullYear() + '-' + (monthBefore) + '-' + (dayBefore);
 	$('#advDateFrom').val(dateBefore);
-	
+
 	$('#advancedSearch').on('keyup keypress', function(e) {
 		var keyCode = e.keyCode || e.which;
 		if(keyCode === 13) {
 			e.preventDefault();
 		}
 	});
-	
+
 	if(location.pathname == '/') {
 		advancedSearch();
 	}
+
 	// Bind enter til søgefunktion
 	$(document).keypress(function(e) {
 		if(e.which == 13) {
@@ -33,7 +34,7 @@ $(document).ready(function() {
 			}
 		}
 	});
-	
+
 });
 
 function regularSearch() {
@@ -44,7 +45,7 @@ function regularSearch() {
 	else {
 		searchText = '';
 	}
-	
+
 	window.location = '/search' + searchText;
 }
 
@@ -80,15 +81,15 @@ function findUser(caller) {
 }
 
 function createUser() {
-	
+
 	var fornavn = $('#fornavn').val();
 	var efternavn = $('#efternavn').val();
 	var initialer = $('#initialer').val();
 	var email = $('#email').val();
 	var password = $('#password').val();
-	
+
 	// validering
-	
+
 	if(!fornavn.length > 0) {
 		alert('Fornavn skal udfyldes');
 	}
@@ -118,19 +119,19 @@ function createUser() {
 			window.location.href = '/admin';
 		});
 		$('#createModal').modal('hide');
-		
+
 	}
 }
 
 function updateUser() {
-	
+
 	var first = $('#editModal').find('#first').val();
 	var last = $('#editModal').find('#last').val();
 	var initials = $('#editModal').find('#initials').val();
 	var email = $('#editModal').find('#email').val();
 	var password = $('#editModal').find('#password').val();
 	var id = $('#editModal').find('#id').val();
-	
+
 	// validering
 	if(!first.length > 0) {
 		alert('Fornavn skal udfyldes');
@@ -177,7 +178,7 @@ function deleteUser() {
 			window.location.href = '/admin';
 		}
 	});
-	
+
 	$('#editModal').modal('hide');
 }
 
