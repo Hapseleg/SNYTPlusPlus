@@ -6,6 +6,10 @@ html
         rel="stylesheet"
         href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
         )
+        link(
+        rel="stylesheet"
+        href="/css/mainCss.css"
+        )
         script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
         script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous")
         script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous")
@@ -21,6 +25,11 @@ html
                         data-toggle="modal"
                         data-target="#createModal"
                         style="font-size: 30px; font-weight: bold;") Opret bruger
+                    ul(class="navbar-nav mr-auto")
+                        li(class="nav-item"): a(
+                        class="nav-link"
+                        href="/"
+                        style="font-size: 30px; font-weight: bold; margin-left: 32em;") Tilbage
             // create user modal
             #createModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel',
             aria-hidden='true')
@@ -91,12 +100,9 @@ html
                                 button.btn.btn-secondary(type='button' id="btnDelete" onclick='deleteUser()') Slet
                                 button.btn.btn-secondary(type='button', data-dismiss='modal') Annuller
         else
-            nav(class="navbar navbar-expand-lg navbar-light bg-light")
-                a(class="navbar-brand" href="/") ADMIN LOGIN
-                button(class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation")
-                    span(class="navbar-toggler-icon")
-            br
-            form(action="/admin/login", method="POST")
+        div(class="col-lg-1 col-centered input")
+            h1 Admin
+            form(action="/admin/login", method="POST" id="adminLogin")
                 fieldset
                     p
                         label Brugernavn
@@ -104,6 +110,7 @@ html
                     p
                         label Adgangskode
                         input(name="adminPassword", type="password")
-                    p
-                        button(type="submit" class="btn btn-primary") Log Ind
-    block body
+            p(class="d-flex flex-row")
+                button(type="submit" class="btn btn-primary" form="adminLogin") Log Ind
+                a(href="/")
+                    button(class="btn btn-secondary" style="margin-left: 2em") Tilbage

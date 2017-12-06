@@ -9,3 +9,9 @@
 .clickableKvitRow {
     cursor: pointer;
 }
+
+.input{
+    font-family: "Verdana";
+    left: 35em;
+    top: 10em;
+}
