@@ -2,6 +2,8 @@
 Tjek at teksten bliver redigeret
  */
 
+//TODO DENNE TEST FUNGERER IKKE MERE
+
 var assert = require('chai').assert;
 var chai = require('chai');
 var chaiHttp = require('chai-http');
@@ -48,8 +50,10 @@ describe('Update SNYT test', function () {
                 }
 
                 console.log(editdoc);
+                console.log(doc[0]);
 
-                assert.not.equal(editdoc[0].text,doc[0].text);
+                assert.equal('123', 'asdf');
+                assert.not.equal(editdoc.text,doc[0].text);
             })
 
             // doc[0]._id

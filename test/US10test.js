@@ -17,7 +17,7 @@ let should = require('should');
 
 let login_details = {
     user: {
-        email: 'test@test.dk',
+        email: 'test6@test.dk',
         password: '123'
     }
 }
@@ -76,6 +76,7 @@ describe('US10: Read a SNYT', function () {
                     // Get request to show a SNYT
                     agent.get('/snyt/' + sejeId)
                         .end(function(err, res) {
+
                             snyt1 = findsnyt(res.text);
                             done();
                         });
@@ -83,6 +84,11 @@ describe('US10: Read a SNYT', function () {
         });
 
         it('Snyt is the same', function (done) {
+            console.log(snyt1.subject + '   b    '+subject);
+            console.log(snyt1.category + '   b    '+category);
+            console.log(snyt1.text + '   b    '+text);
+            console.log(snyt1.user + '   b    '+user);
+            console.log(snyt1.edok + '   b    '+eDok);
             assert.equal(snyt1.subject, subject);
             assert.equal(snyt1.category, category);
             assert.equal(snyt1.text, text);

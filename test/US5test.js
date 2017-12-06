@@ -18,8 +18,8 @@ let should = require('should');
 
 let login_details = {
     user: {
-        email: 'test2@test.dk',
-        password: '1234'
+        email: 'test6@test.dk',
+        password: '123'
     }
 };
 
@@ -50,6 +50,7 @@ describe('US5: Læsekvittere a SNYT', function() {
         Snyt.remove( {subject: subject}).exec();
         User.findOne(login_details.user).exec().then(function(user) {
             uid = user._id;
+            console.log(user);
         });
         createTestSnyt(done);
     });
@@ -71,6 +72,8 @@ describe('US5: Læsekvittere a SNYT', function() {
 
         it('SNYT should be læsekvitteret now', function(done) {
             Snyt.findOne({ _id: sejeId}).exec().then(function(snyt) {
+                console.log(snyt);
+                console.log(uid);
                 let hasRead = snyt.readBy.indexOf(uid) > -1;
                 assert.equal(true, hasRead);
                 done();

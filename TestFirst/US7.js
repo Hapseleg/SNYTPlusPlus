@@ -1,3 +1,4 @@
+//TODO DENNE TEST FUNGERER IKKE MERE
 process.env.NODE_ENV = 'test';
 var assert = require('chai').assert;
 var chai = require('chai');

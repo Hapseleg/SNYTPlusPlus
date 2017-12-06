@@ -6,6 +6,8 @@ Test at den bliver gemt i db når man trykker opret
 v2 billeder, login
  */
 
+//TODO DENNE TEST FUNGERER MÅSKE IKKE MERE
+
 // var assert = require('assert');
 // const equals = require('chai').equals;
 // var expect = require('chai').expect;
