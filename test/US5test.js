@@ -83,8 +83,4 @@ describe('US5: Læsekvittere a SNYT', function() {
         });
     });
 
-    after(function(done) {
-        shutdown();
-        done();
-    });
 });

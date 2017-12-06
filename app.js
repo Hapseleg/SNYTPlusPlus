@@ -95,7 +95,7 @@ app.use(function(req, res, next) {
 		res.locals.authenticated = false;
 		next();
 	}
-	
+
 	//TODO KUN TIL TEST HVIS DU IKKE HAR ET LOGIN!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// res.locals.authenticated = true;
 	// next();
@@ -147,7 +147,10 @@ app.post('/', function(req, res) {
 			req.session.loggedIn = doc._id;
 			returnJson.message = 'Du blev logget ind';
 		}
-		res.render('index', returnJson);
+		res.render('index', returnJson, function(err, html) {
+            console.log(req);
+            res.send(html);
+        });
 	});
 });
 
@@ -177,16 +180,16 @@ app.get('/opretsnyt', function(req, res) {
 	let yyyy = today.getFullYear();
 	let mm = today.getMonth() + 1;
 	let dd = today.getDate();
-	
+
 	if(dd < 10) {
 		dd = '0' + dd;
 	}
 	if(mm < 10) {
 		mm = '0' + mm;
 	}
-	
+
 	returnJson.data.date = yyyy + '-' + mm + '-' + dd;
-	
+
 	res.render('createSnyt', returnJson);
 });
 
@@ -220,9 +223,9 @@ app.post('/opretsnyt', function(req, res) {
 	//         newSnyt.notReadBy = a;
 	//     });
 	// }();
-	
+
 	// console.log(req.body.snyt.created);
-	
+
 	newSnyt.save(function(err, snyt) {
 		if(err) {
 			returnJson.errors.push('Der skete en fejl da vi forsøgte at gemme din SNYT');
@@ -236,7 +239,7 @@ app.post('/opretsnyt', function(req, res) {
 });
 app.get('/updateSnyt/:id', function(req, res) {
 	//mangler sikkerhed: man kan stadig bypass ved at gå på url'en (altså hvis man ikke er den bruger der har oprettet SNYT'en) men vi synes ikke det er nødvendigt..
-	
+
 	var returnJson = {
 		errors: [],
 		message: null,
@@ -249,17 +252,17 @@ app.get('/updateSnyt/:id', function(req, res) {
 	let yyyy = today.getFullYear();
 	let mm = today.getMonth() + 1;
 	let dd = today.getDate();
-	
+
 	if(dd < 10) {
 		dd = '0' + dd;
 	}
 	if(mm < 10) {
 		mm = '0' + mm;
 	}
-	
+
 	returnJson.data.date = yyyy + '-' + mm + '-' + dd;
 	returnJson.data.snytid = req.params.id;
-	
+
 	res.render('updateSnyt', returnJson);
 });
 
@@ -275,12 +278,12 @@ app.post('/updateSnyt/:id', function(req, res) {
 	newsubsnyt.text = req.body.subsnyt.text;
 	newsubsnyt.user = req.body.subsnyt.user;
 	newsubsnyt.created = req.body.subsnyt.created;
-	
+
 	newsubsnyt.save(function(err, subsnyt) {
 		if(err) {
 			returnJson.errors.push('Der skete en fejl da vi forsøgte at gemme din opdatering');
 		}
-		
+
 		Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id}}).exec(function(err, doc) {
 			res.redirect('/snyt/' + req.params.id);
 		})
@@ -350,7 +353,7 @@ app.post('/snyt/:id', function(req, res) {
 	// }).catch(function (err) {
 	//     console.log('\n mere snyt \n' + err);
 	// });
-	
+
 	res.redirect('/snyt/' + req.params.id);
 });
 
@@ -365,7 +368,7 @@ app.post('/editSnyt', function(req, res) {
 			snyt: null
 		}
 	};
-	
+
 	//sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
 	if(res.locals.me.initials == doc.user) {
 		var newSnyt = new Snyt();
@@ -376,7 +379,7 @@ app.post('/editSnyt', function(req, res) {
 		newSnyt.created = req.body.snyt.created;
 		newSnyt.edok = req.body.snyt.edok;
 		newSnyt._id = req.body.snyt._id;
-		
+
 		Snyt.findOneAndUpdate({'_id': newSnyt._id}, {
 			'subject': newSnyt.subject,
 			'category': newSnyt.category,
@@ -412,9 +415,9 @@ app.get('/editSnyt/:id', function(req, res) {
 			let yyyy = doc.created.getFullYear();
 			let mm = doc.created.getMonth() + 1;
 			let dd = doc.created.getDate();
-			
+
 			// console.log("DAAAY" + dd);
-			
+
 			if(dd < 10) {
 				dd = '0' + dd;
 			}
@@ -448,7 +451,7 @@ app.get('/search', function(req, res) {
 			snyt: null
 		}
 	};
-	
+
 	Snyt.find({}).sort({'created': -1}).exec(function(err, doc) {
 		if(err) {
 			returnJson.errors.push('Der skete en under søgningen');
@@ -467,96 +470,134 @@ app.get('/search', function(req, res) {
  * Almindelig søgning
  */
 app.get('/search/:text', function(req, res) {
-	var returnJson = {
-		errors: [],
-		message: null,
-		data: {
-			snyt: null
-		}
-	};
-	var reg = new RegExp('.*' + req.params.text + '.*', 'i');
-	Snyt.find({'$or': [{'subject': reg}, {'text': reg}]}).sort({'created': -1}).exec(function(err, doc) {
-		if(err) {
-			returnJson.errors.push('Der skete en under søgningen');
-		}
-		if(!doc) {
-			returnJson.errors.push('Jeg fandt desværre ingen SNYT. Prøv en anden søgning.');
-			returnJson.message = 'Der gik noget galt';
-		} else {
-			returnJson.data.snyt = doc;
-		}
-		res.render('index', returnJson);
-	});
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            snyt: null
+        }
+    };
+    var words = req.params.text.split(" ");
+    var regexs = [];
+    words.forEach(function(word) {
+        regexs.push(new RegExp("^.*" + word + ".*$", "i"));
+    });
+    var reg = new RegExp(".*" + req.params.text + ".*", "i");
+    var subjectRegs = [];
+    regexs.forEach(function(i) {
+        subjectRegs.push({"subject" : i});
+    });
+    var textRegs = [];
+    regexs.forEach(function(i) {
+        textRegs.push({"text" : i});
+    });
+    var searchObject = {
+        "$or" : [
+            {
+                "$or" : subjectRegs
+            },
+            {
+                "$and" : textRegs
+            }
+        ]
+    };
+    Snyt.find(searchObject).sort({"created" : -1}).exec(function(err, doc) {
+        if(err) {
+            returnJson.errors.push("Der skete en under søgningen");
+        }
+        if(!doc) {
+            returnJson.errors.push("Jeg fandt desværre ingen SNYT. Prøv en anden søgning.");
+            returnJson.message = "Der gik noget galt";
+        } else {
+            returnJson.data.snyt = doc;
+        }
+        res.render('index', returnJson);
+    });
 });
 
 /*
  * Avanceret søgning
  */
 app.post('/search', function(req, res) {
-	var returnJson = {
-		errors: [],
-		message: null,
-		data: {
-			snyt: null
-		}
-	};
-	var text = req.body.text;
-	var dateFrom = new Date(req.body.dateFrom);
-	var dateTo = new Date(req.body.dateTo);
-	dateTo.setHours(24);
-	dateTo.setMinutes(59);
-	dateTo.setSeconds(59);
-	dateFrom = dateFrom.toISOString();
-	dateTo = dateTo.toISOString();
-	var read = req.body.advRadioButtons;
-	var category = req.body.category;
-	var regExText = new RegExp('.*' + text + '.*', 'i');
-	var readOption = {};
-	var categoryOption = {};
-	var textOption = {};
-	if(read == 'true') {
-		readOption = {'readBy': {'$in': [res.locals.me._id.toString()]}};
-	} else if(read == 'false') {
-		readOption = {'readBy': {'$nin': [res.locals.me._id.toString()]}};
-	}
-	if(category.length > 0) {
-		categoryOption = {'category': category};
-	}
-	if(text.length > 0) {
-		textOption = {
-			'$or':
-				[
-					{'subject': regExText},
-					{'text': regExText}
-				]
-		};
-	}
-	Snyt.find(
-		{
-			'$and':
-				[
-					categoryOption,
-					textOption,
-					{
-						'created': {
-							'$gte': dateFrom,
-							'$lte': dateTo
-						}
-					},
-					readOption
-				]
-		}).sort({'created': -1}).exec(function(err, doc) {
-		if(err) {
-			returnJson.errors.push('Der skete en fejl under søgningen');
-		}
-		if(!doc) {
-			returnJson.errors.push('Jeg fandt desværre ingen SNYT. Prøv en anden søgning.');
-			returnJson.message = 'Der gik noget galt';
-		} else {
-			returnJson.data.snyt = doc;
-		}
-		res.render('index', returnJson);
-	});
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            snyt: null
+        }
+    };
+    var text = req.body.text;
+    var dateFrom = new Date(req.body.dateFrom);
+    var dateTo = new Date(req.body.dateTo);
+    dateTo.setHours(24);
+    dateTo.setMinutes(59);
+    dateTo.setSeconds(59);
+    dateFrom = dateFrom.toISOString();
+    dateTo = dateTo.toISOString();
+    var read = req.body.advRadioButtons;
+    var category = req.body.category;
+    var readOption = {};
+    var categoryOption = {};
+    var textOption = {};
+    if(read == "true") {
+        readOption = {"readBy" : {"$in" : [res.locals.me._id.toString()]}};
+    } else if(read == "false") {
+        readOption = {"readBy" : {"$nin" : [res.locals.me._id.toString()]}};
+    }
+    if(category.length > 0) {
+        categoryOption = {"category" : category};
+    }
+    if(text.length > 0) {
+        var words = req.body.text.split(" ");
+        var regexs = [];
+        words.forEach(function(word) {
+            regexs.push(new RegExp("^.*" + word + ".*$", "i"));
+        });
+        var subjectRegs = [];
+        regexs.forEach(function(i) {
+            subjectRegs.push({"subject" : i});
+        });
+        var textRegs = [];
+        regexs.forEach(function(i) {
+            textRegs.push({"text" : i});
+        });
+        textOption = {
+            "$or" : [
+                {
+                    "$or" : subjectRegs
+                },
+                {
+                    "$and" : textRegs
+                }
+            ]
+        };
+    }
+
+    var searchObject = {
+        "$and" :
+            [
+                categoryOption,
+                textOption,
+                {"created" : {
+                    "$gte" : dateFrom,
+                    "$lte" : dateTo
+                }},
+                readOption
+            ]
+    };
+    Snyt.find(searchObject).sort({"created" : -1}).exec(function(err, doc) {
+        if(err) {
+            returnJson.errors.push("Der skete en fejl under søgningen");
+            returnJson.message = "Der gik noget galt";
+        }
+        if(!doc) {
+            returnJson.errors.push("Jeg fandt desværre ingen SNYT. Prøv en anden søgning.");
+            returnJson.message = "Der gik noget galt";
+        } else {
+            returnJson.data.snyt = doc;
+        }
+        res.render('index', returnJson);
+    });
 });
 
 //----------------------------------------------
@@ -568,7 +609,7 @@ app.post('/search', function(req, res) {
 app.post('/admin/login', function(req, res) {
 	var adminUsername = 'administrator';
 	var adminPassword = 'pokemon';
-	
+
 	if(req.body.adminUsername == adminUsername && req.body.adminPassword == adminPassword) {
 		req.session.adminLoggedIn = 'thisIsAdmin';
 	}
@@ -638,7 +679,7 @@ app.post('/admin', function(req, res) {
 	newUser.initials = req.body.user.initials;
 	newUser.email = req.body.user.email;
 	newUser.password = req.body.user.password;
-	
+
 	// var AddNewUserToAllSnyts = function() {
 	//     Snyt.find().exec().then(function (snyt) {
 	//         for (var n in snyt) {
@@ -647,13 +688,13 @@ app.post('/admin', function(req, res) {
 	//         }
 	//     });
 	// }();
-	
+
 	newUser.save(function(err, user) {
 		if(err) {
 			returnJson.errors.push('Kunne ikke gemme');
 		}
 	});
-	
+
 	res.redirect('/admin');
 });
 
@@ -663,7 +704,7 @@ app.post('/admin', function(req, res) {
 app.post('/admin/user', function(req, res) {
 	var email = req.body.email;
 	var password = req.body.password;
-	
+
 	User.findOne({'email': email, 'password': password}).exec(function(err, doc) {
 		if(!doc) {
 			res.json({errors: ['Ingen bruger']});

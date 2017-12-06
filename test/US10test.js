@@ -20,7 +20,7 @@ let login_details = {
         email: 'test6@test.dk',
         password: '123'
     }
-}
+};
 
 function createTestSnyt (done){
     var nysnyt = new Snyt();
@@ -84,11 +84,11 @@ describe('US10: Read a SNYT', function () {
         });
 
         it('Snyt is the same', function (done) {
-            console.log(snyt1.subject + '   b    '+subject);
-            console.log(snyt1.category + '   b    '+category);
-            console.log(snyt1.text + '   b    '+text);
-            console.log(snyt1.user + '   b    '+user);
-            console.log(snyt1.edok + '   b    '+eDok);
+            console.log(snyt1.subject + '\n'+subject);
+            console.log(snyt1.category + '\n'+category);
+            console.log(snyt1.text + '\n'+text);
+            console.log(snyt1.user + '\n'+user);
+            console.log(snyt1.edok + '\n'+eDok);
             assert.equal(snyt1.subject, subject);
             assert.equal(snyt1.category, category);
             assert.equal(snyt1.text, text);
@@ -97,10 +97,8 @@ describe('US10: Read a SNYT', function () {
             done();
         });
     });
-
-    after(function(done) {
-        shutdown();
-        done();
-    });
-
+    // after(function(done) {
+    //     shutdown();
+    //     done();
+    // });
 });
