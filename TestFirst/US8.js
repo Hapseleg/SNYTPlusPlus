@@ -1,3 +1,4 @@
+//TODO DENNE TEST FUNGERER IKKE MERE
 var assert = require('chai').assert;
 var chai = require('chai');
 var chaiHttp = require('chai-http');
@@ -5,8 +6,8 @@ chai.use(chaiHttp);
 var app = "http://localhost:1337";
 var login_details = {
     user: {
-        email: 'test2@test.dk',
-        password: '1234'
+        email: 'test6@test.dk',
+        password: '123'
     }
 };
 
@@ -19,7 +20,7 @@ describe('er han logget ind', function () {
                 .type('form')
                 .send(login_details)
                 .end(function (err, res) {
-                    // console.log(res.request);
+                    console.log(res.request);
                     assert.isAbove(res.request.cookies.length, 1);
                     done();
                 });
