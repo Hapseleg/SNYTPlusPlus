@@ -1,26 +1,26 @@
 $(document).ready(function() {
-    var now = new Date();
-    var dayNow = ("0" + now.getDate()).slice(-2);
-    var monthNow = ("0" + (now.getMonth() + 1)).slice(-2);
-    var today = now.getFullYear()+"-"+(monthNow)+"-"+(dayNow) ;
-    $('#advDateTo').val(today);
-
-    var before = new Date();
-    before.setMonth(before.getMonth() - 2);
-    var dayBefore = ("0" + before.getDate()).slice(-2);
-    var monthBefore = ("0" + (before.getMonth() + 1)).slice(-2);
-    var dateBefore = before.getFullYear() + "-" + (monthBefore) + "-" + (dayBefore);
-    $("#advDateFrom").val(dateBefore);
-
-    $('#advancedSearch').on('keyup keypress', function(e) {
-        var keyCode = e.keyCode || e.which;
-        if (keyCode === 13) {
-            e.preventDefault();
-        }
-    });
-
-    if(location.pathname == "/") {
-    	advancedSearch();
+	var now = new Date();
+	var dayNow = ('0' + now.getDate()).slice(-2);
+	var monthNow = ('0' + (now.getMonth() + 1)).slice(-2);
+	var today = now.getFullYear() + '-' + (monthNow) + '-' + (dayNow);
+	$('#advDateTo').val(today);
+	
+	var before = new Date();
+	before.setMonth(before.getMonth() - 2);
+	var dayBefore = ('0' + before.getDate()).slice(-2);
+	var monthBefore = ('0' + (before.getMonth() + 1)).slice(-2);
+	var dateBefore = before.getFullYear() + '-' + (monthBefore) + '-' + (dayBefore);
+	$('#advDateFrom').val(dateBefore);
+	
+	$('#advancedSearch').on('keyup keypress', function(e) {
+		var keyCode = e.keyCode || e.which;
+		if(keyCode === 13) {
+			e.preventDefault();
+		}
+	});
+	
+	if(location.pathname == '/') {
+		advancedSearch();
 	}
 	// Bind enter til søgefunktion
 	$(document).keypress(function(e) {
@@ -33,7 +33,7 @@ $(document).ready(function() {
 			}
 		}
 	});
-
+	
 });
 
 function regularSearch() {
@@ -88,7 +88,7 @@ function createUser() {
 	var password = $('#password').val();
 	
 	// validering
-
+	
 	if(!fornavn.length > 0) {
 		alert('Fornavn skal udfyldes');
 	}
@@ -114,8 +114,11 @@ function createUser() {
 					email: email,
 					password: password
 				}
-			});
+			}).done(function() {
+			window.location.href = '/admin';
+		});
 		$('#createModal').modal('hide');
+		
 	}
 }
 
@@ -155,12 +158,27 @@ function updateUser() {
 				password: password,
 				id: id
 			}
-		);
+		).done(() => {
+			window.location.href = '/admin';
+		});
 		$('#editModal').modal('hide');
 	}
 }
 
 function deleteUser() {
+	var id = $('#editModal').find('#id').val();
+	console.log(id);
+	console.log('Starting AJAX request');
+	$.ajax({
+		url: '/admin',
+		data: {id: id},
+		type: 'DELETE',
+		success: function(result) {
+			window.location.href = '/admin';
+		}
+	});
+	
+	$('#editModal').modal('hide');
 }
 
 //https://www.w3schools.com/howto/howto_js_sort_table.asp
