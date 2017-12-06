@@ -245,6 +245,7 @@ var toBeDeletedPics = [];
 function addPicToDelete(picid) {
     //get id fra this (det er filename) og add til array og grey out i html
     // console.log(toBeDeletedPics);
+    // console.log(picid);
 
 	// console.log($('#'+picid).css("border"));
 	// if($('#'+picid).css("filter") == "grayscale(1)"){
@@ -269,7 +270,7 @@ function addPicToDelete(picid) {
 
 function deletePictures(row) {
     var id = $(row).data("href");
-    console.log(id);
+    // console.log(id);
 	// console.log(snytid);
 	//slet alle i array
     $.post("/deletePictures",

@@ -362,7 +362,7 @@ app.post('/snyt/:id', function(req, res) {
 /*
  *
  */
-app.post('/editSnyt', function(req, res) {
+app.post('/editSnyt',upload.array('pic'), function(req, res) {
 	var returnJson = {
 		errors: [],
 		message: null,
@@ -371,22 +371,31 @@ app.post('/editSnyt', function(req, res) {
 		}
 	};
 
-    //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
+	var newSnyt = new Snyt();
+	newSnyt.subject = req.body.snyt.subject;
+	newSnyt.category = req.body.snyt.category;
+	newSnyt.text = req.body.snyt.text;
+	newSnyt.user = req.body.snyt.user;
+	newSnyt.created = req.body.snyt.created;
+	newSnyt.edok = req.body.snyt.edok;
+	newSnyt._id = req.body.snyt._id;
 
-        var newSnyt = new Snyt();
-        newSnyt.subject = req.body.snyt.subject;
-        newSnyt.category = req.body.snyt.category;
-        newSnyt.text = req.body.snyt.text;
-        newSnyt.user = req.body.snyt.user;
-        newSnyt.created = req.body.snyt.created;
-        newSnyt.edok = req.body.snyt.edok;
-        newSnyt._id = req.body.snyt._id;
+	// console.log(req.files)
+    for(p in req.files){
+        newSnyt.pictures.push(req.files[p].filename);
+    }
 
-        Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
+        Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok,$push: {pictures: newSnyt.pictures[0]}}, {new:true}).exec().then(function(doc) {
+        	//TODO kan kun tilføje et billede af gangen pga hvis man skriver $push: {pictures: newSnyt.pictures} smider den selve arrayet ind i picture array'et der er i databasen (fremfor det der er indeni arrayet)
+
+
+            //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
+            // console.log("FINDONE I EDITSNYT POST:");
+            // console.log(res.locals.me.initials == doc.user);
             if(res.locals.me.initials == doc.user){
-                returnJson.data = [].push(doc);
-                console.log(returnJson.data);
-                res.render('index', returnJson);
+                returnJson.data.snyt = doc;
+                // console.log(returnJson.data);
+                res.render('showSnyt', returnJson);
             }
             else{
                 res.redirect('/');
@@ -426,6 +435,7 @@ app.get('/editSnyt/:id', function(req, res) {
 				mm = '0' + mm;
 			}
 			doc.createdDate = yyyy + '-' + mm + '-' + dd;
+
 			returnJson.data.snyt = doc;
 			res.render('editSnyt', returnJson);
 		}
@@ -440,10 +450,12 @@ app.get('/editSnyt/:id', function(req, res) {
 
 app.post('/deletePictures', function(req, res) {
     //$pop
-    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pop: {pictures: req.body.pics }})
+	console.log(req.body);
+	//TODO kan kun slette en af gangen da man ikke kan slette flere ad gangen, der skal derfor laves flere kald..
+    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pull: {"pictures": req.body.pics[0] }})
         .catch(function (err) {
             returnJson.errors.push(err);
-            res.render('index', returnJson);
+            // res.render('showSnyt', returnJson);
         });
 
     // Snyt.find({"_id" : mongoose.Types.ObjectId(req.body.id)})

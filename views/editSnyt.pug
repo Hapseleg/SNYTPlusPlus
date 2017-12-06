@@ -2,7 +2,7 @@ extends layout.pug
 block body
     if(authenticated)
         if errors.length == 0
-            form(action="/editSnyt", method="POST")
+            form(action="/editSnyt", method="POST" enctype = "multipart/form-data")
                 div(class="row")
                     div(class="col-2")
                         fieldset
@@ -29,9 +29,12 @@ block body
                                     option(value="IT") IT
                                     option(value="Klinisk Forsøg") Klinisk Forsøg
                                     option(value="Produktion") Produktion
+                            li
+                                label Billeder
+                                    input(name='pic', type='file' multiple)
                             br
                             li
-                                button(type="submit" class="btn btn-primary" data-href=data.id onclick="deletePictures(this)") OK
+                                button(type="submit" class="btn btn-primary" data-href=data.snyt._id onclick="deletePictures(this)") OK
                                 button(type="button" class="btn btn-primary" onclick="goBack();" style="margin-left: " +
                                 "5px;") Gå tilbage
 
@@ -45,9 +48,9 @@ block body
                             br
                             li
                                 textarea(rows="20" cols="150" name="snyt[text]").form-control=data.snyt.text
-                            if(data.pictures.length > 0)
+                            if(data.snyt.pictures.length > 0)
                                 li(id="picli")
-                                    each pic in data.pictures
+                                    each pic in data.snyt.pictures
                                         img(src="/uploads/" + pic style="max-width: 15em;" onclick="addPicToDelete(this.id)" id= pic)
 
 
