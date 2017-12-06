@@ -52,18 +52,23 @@ block body
                                 li
                                     textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
             if(data.hasSubSnyt)
-                each sub in data.subSnytsInSnyt
+                div(class="row")
+                    div(class="col-5")
+                        ul(type="none")
+                    div(class="col-7")
+                        h6 Der er #{data.subSnytsInSnyt.length} opdateringer til denne SNYT. Den øverste er den nyeste
+                - for(var i = data.subSnytsInSnyt.length - 1; i >= 0; i--)
                     div(class="row")
                         div(class="col-2")
                             ul(type="none")
                                 li
                                     label Dato
-                                        input(type="text" name="snyt[created]" value=sub.created.toLocaleDateString() disabled=true)
+                                        input(type="text" name="snyt[created]" value=data.subSnytsInSnyt[i].created.toLocaleDateString() disabled=true)
                                     li
                                     label Initialer
-                                        input(type="text" name="snyt[user]", value=sub.user disabled = true)
+                                        input(type="text" name="snyt[user]", value=data.subSnytsInSnyt[i].user disabled = true)
 
                         div(class="col-10")
                             ul(type="none")
                                 li
-                                    textarea(rows="10" cols="150" disabled = true name="snyt[text]").form-control=sub.text
+                                    textarea(rows="10" cols="150" disabled = true name="snyt[text]").form-control=data.subSnytsInSnyt[i].text

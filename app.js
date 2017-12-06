@@ -147,7 +147,10 @@ app.post('/',function (req,res) {
             req.session.loggedIn = doc._id;
             returnJson.message = "Du blev logget ind";
         }
-        res.render('index', returnJson);
+        res.render('index', returnJson, function(err, html) {
+            console.log(req);
+            res.send(html);
+        });
     });
 });
 
@@ -467,8 +470,31 @@ app.get('/search/:text', function(req, res) {
             snyt: null
         }
     };
+    var words = req.params.text.split(" ");
+    var regexs = [];
+    words.forEach(function(word) {
+        regexs.push(new RegExp("^.*" + word + ".*$", "i"));
+    });
     var reg = new RegExp(".*" + req.params.text + ".*", "i");
-    Snyt.find({"$or":[{"subject": reg}, {"text": reg}]}).sort({"created" : -1}).exec(function(err, doc) {
+    var subjectRegs = [];
+    regexs.forEach(function(i) {
+        subjectRegs.push({"subject" : i});
+    });
+    var textRegs = [];
+    regexs.forEach(function(i) {
+        textRegs.push({"text" : i});
+    });
+    var searchObject = {
+        "$or" : [
+            {
+                "$or" : subjectRegs
+            },
+            {
+                "$and" : textRegs
+            }
+        ]
+    };
+    Snyt.find(searchObject).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
             returnJson.errors.push("Der skete en under søgningen");
         }
@@ -503,7 +529,6 @@ app.post('/search', function(req, res) {
     dateTo = dateTo.toISOString();
     var read = req.body.advRadioButtons;
     var category = req.body.category;
-    var regExText = new RegExp(".*" + text + ".*", "i");
     var readOption = {};
     var categoryOption = {};
     var textOption = {};
@@ -516,16 +541,33 @@ app.post('/search', function(req, res) {
         categoryOption = {"category" : category};
     }
     if(text.length > 0) {
+        var words = req.body.text.split(" ");
+        var regexs = [];
+        words.forEach(function(word) {
+            regexs.push(new RegExp("^.*" + word + ".*$", "i"));
+        });
+        var subjectRegs = [];
+        regexs.forEach(function(i) {
+            subjectRegs.push({"subject" : i});
+        });
+        var textRegs = [];
+        regexs.forEach(function(i) {
+            textRegs.push({"text" : i});
+        });
         textOption = {
-            "$or":
-                [
-                    {"subject": regExText},
-                    {"text": regExText}
-                ]
+            "$or" : [
+                {
+                    "$or" : subjectRegs
+                },
+                {
+                    "$and" : textRegs
+                }
+            ]
         };
     }
-    Snyt.find(
-        {"$and" :
+
+    var searchObject = {
+        "$and" :
             [
                 categoryOption,
                 textOption,
@@ -535,9 +577,11 @@ app.post('/search', function(req, res) {
                 }},
                 readOption
             ]
-        }).sort({"created" : -1}).exec(function(err, doc) {
+    };
+    Snyt.find(searchObject).sort({"created" : -1}).exec(function(err, doc) {
         if(err) {
             returnJson.errors.push("Der skete en fejl under søgningen");
+            returnJson.message = "Der gik noget galt";
         }
         if(!doc) {
             returnJson.errors.push("Jeg fandt desværre ingen SNYT. Prøv en anden søgning.");
