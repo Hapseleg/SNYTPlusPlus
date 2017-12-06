@@ -732,8 +732,6 @@ app.get('/admin/logout', function(req, res) {
     res.redirect('/admin');
 });
 
-
-
 /*
 * Helper method to get all users
 */
