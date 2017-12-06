@@ -9,3 +9,17 @@
 .clickableKvitRow {
     cursor: pointer;
 }
+
+.full-dialog {
+    min-width: 80%;
+    min-height: 80%;
+    margin: 0;
+    padding: 0;
+    margin-left: 10%;
+}
+
+.full-content {
+    height: auto;
+    min-height: 100%;
+    border-radius: 0;
+}

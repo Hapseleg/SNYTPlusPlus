@@ -30,7 +30,7 @@ block body
                                 option(value="Produktion") Produktion
                         br
                         li
-                            button(type="submit" class="btn btn-primary") OK
+                            button(type="submit" class="btn btn-primary" data-href=data.id onclick="deletePictures(this)") OK
                             button(type="button" class="btn btn-primary" onclick="goBack();" style="margin-left: " +
                             "5px;") Gå tilbage
 
@@ -44,7 +44,10 @@ block body
                         br
                         li
                             textarea(rows="20" cols="150" name="snyt[text]").form-control=data.text
-
+                        if(data.pictures.length > 0)
+                            li(id="picli")
+                                each pic in data.pictures
+                                    img(src="/uploads/" + pic style="max-width: 15em;" onclick="addPicToDelete(this.id)" id= pic)
     script.
         $(document).ready(function () {
             $('option[value="#{data.category}"]').prop("selected", true);

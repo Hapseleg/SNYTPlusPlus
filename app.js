@@ -8,6 +8,8 @@ var express = require('express'),
     cookieSession = require('cookie-session'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
+    multer = require('multer'),
+    upload = multer({ dest: 'public/uploads'}),
     rp = require('request-promise'),
     config = require('config'),
     SubSnyt = require('./models/Subsnyt.model'),
@@ -22,6 +24,7 @@ var express = require('express'),
 
 var app = express();
 app.use(express.static('public'));
+app.use(express.static('uploads'));
 
 // View options
 app.set('view engine', 'pug');
@@ -111,6 +114,7 @@ app.use(function(req, res, next) {
     next();
 });
 
+
 //***************************************************************************
 // Routes
 //***************************************************************************
@@ -194,13 +198,17 @@ app.get('/opretsnyt', function (req,res) {
  * Recieve SNYT data from user and create the document in mongo
  * Then redirect to /
  */
-app.post('/opretsnyt',function (req,res) {
+//app.post('/opretsnyt',upload.single('pic'),function (req,res) {
+app.post('/opretsnyt',upload.array('pic'),function (req,res) {
+    // console.log(req.files);
+
     var returnJson = {
         errors : [],
         message : null,
         data : null
     };
-    console.log(req.body);
+
+    // console.log(req.body);
     var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
@@ -208,18 +216,12 @@ app.post('/opretsnyt',function (req,res) {
     newSnyt.user = req.body.snyt.user;
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
-    // var AddAllUsersToNewSnyt = function() {
-    //     User.find().exec().then(function (user) {
-    //         var a = [];
-    //         for (var j in user) {
-    //             console.log(j + '_:_ '+user[j]);
-    //             a.push(user[j]._id);
-    //         }
-    //         newSnyt.notReadBy = a;
-    //     });
-    // }();
 
-    // console.log(req.body.snyt.created);
+    // newSnyt.pictures.push({filename: req.file.filename, orgName: req.file.originalname});
+    for(p in req.files){
+        newSnyt.pictures.push(req.files[p].filename);
+    }
+    console.log(newSnyt);
 
     newSnyt.save(function (err, snyt) {
        if(err){
@@ -231,6 +233,7 @@ app.post('/opretsnyt',function (req,res) {
        res.render('index', returnJson);
     });
 });
+
 app.get('/updateSnyt/:id', function (req,res) {
     //mangler sikkerhed: man kan stadig bypass ved at gå på url'en (altså hvis man ikke er den bruger der har oprettet SNYT'en) men vi synes ikke det er nødvendigt..
 
@@ -313,6 +316,8 @@ app.route('/snyt/:id').get(function (req, res) {
             }
             returnJson.data.subSnytsInSnyt = subdoc;
             returnJson.data.snyt = doc;
+
+            console.log(doc);
             res.render('showSnyt', returnJson);
         });
     }).catch(function (err) {
@@ -355,7 +360,7 @@ app.post('/editSnyt',function (req, res) {
     };
 
     //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
-    if(res.locals.me.initials == doc.user){
+
         var newSnyt = new Snyt();
         newSnyt.subject = req.body.snyt.subject;
         newSnyt.category = req.body.snyt.category;
@@ -366,17 +371,19 @@ app.post('/editSnyt',function (req, res) {
         newSnyt._id = req.body.snyt._id;
 
         Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
-            returnJson.data = [].push(doc);
-            console.log(returnJson.data);
-            res.render('index', returnJson);
+            if(res.locals.me.initials == doc.user){
+                returnJson.data = [].push(doc);
+                console.log(returnJson.data);
+                res.render('index', returnJson);
+            }
+            else{
+                res.redirect('/');
+            }
+
         }).catch(function (err) {
             returnJson.errors.push(err);
             res.render('index', returnJson);
         });
-    }
-    else{
-        res.redirect('/');
-    }
 });
 
 /*
@@ -415,6 +422,18 @@ app.get('/editSnyt/:id',function (req, res) {
         returnJson.errors.push(err);
         res.render('index', returnJson);
     });
+});
+
+app.post('/deletePictures', function(req, res) {
+    //$pop
+    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pop: {pictures: req.body.pics }})
+        .catch(function (err) {
+            returnJson.errors.push(err);
+            res.render('index', returnJson);
+        });
+
+    // Snyt.find({"_id" : mongoose.Types.ObjectId(req.body.id)})
+    // console.log(req.body);
 });
 
 //----------------------------------------------

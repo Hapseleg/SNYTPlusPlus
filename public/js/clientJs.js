@@ -221,3 +221,45 @@ function sortTable(n) {
         }
     }
 }
+
+
+//*******************************************
+//used in editsnyt to delete pictures
+var toBeDeletedPics = [];
+function addPicToDelete(picid) {
+    //get id fra this (det er filename) og add til array og grey out i html
+    // console.log(toBeDeletedPics);
+
+	// console.log($('#'+picid).css("border"));
+	// if($('#'+picid).css("filter") == "grayscale(1)"){
+    if($('#'+picid).css("border") == "10px solid rgb(255, 0, 0)"){
+        $('#'+picid).css("border", "0px solid red");
+        // $('#'+picid).css("filter", "grayscale(0%)");
+
+        for(var i = toBeDeletedPics.length -1; i >= 0; i--) {
+            if (toBeDeletedPics[i] == picid) {
+                toBeDeletedPics.splice(i, 1);
+            }
+            toBeDeletedPics.splice()
+        }
+	}
+	else{
+        $('#'+picid).css("border", "10px solid red");
+        // $('#'+picid).css("filter", "grayscale(100%)");
+        toBeDeletedPics.push(picid)
+	}
+	// console.log(toBeDeletedPics);
+}
+
+function deletePictures(row) {
+    var id = $(row).data("href");
+    console.log(id);
+	// console.log(snytid);
+	//slet alle i array
+    $.post("/deletePictures",
+        {
+        	pics: toBeDeletedPics,
+			snytid: id
+        });
+}
+//*******************************************

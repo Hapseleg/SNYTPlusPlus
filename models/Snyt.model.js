@@ -28,7 +28,8 @@ var SnytSchema = new Schema({
     created: {type: Date, default: Date.now},
     edok : String,
     idSubSnyts: [],
-    readBy: []
+    readBy: [],
+    pictures: []
 });
 
 module.exports = mongoose.model('Snyts', SnytSchema);
