@@ -1,3 +1,4 @@
+//TODO DENNE TEST FUNGERER IKKE MERE
 var assert = require('chai').assert;
 var chai = require('chai');
 var chaiHttp = require('chai-http');
