@@ -26,17 +26,17 @@ block body
 
     else
         //Hvis man ikke er logget ind kommer det her:
-    div(class="col-lg-1 col-centered input")
-        h1 SNYT++
-        form(action="/", method="POST" id="mainLogin")
-            fieldset
-                p
-                    label Email
-                    input(name="user[email]", type="text", value=signupEmail)
-                p
-                    label Password
-                    input(name="user[password]", type="password")
-        p(class="d-flex flex-row")
-            button(type="submit" class="btn btn-primary" form="mainLogin") Log Ind
-            a(href="/admin")
-                button(class="btn btn-secondary" style="margin-left: 2em") Admin
+        div(class="col-lg-1 col-centered input")
+            h1 SNYT++
+            form(action="/", method="POST" id="mainLogin")
+                fieldset
+                    p
+                        label Email
+                        input(name="user[email]", type="text", value=signupEmail)
+                    p
+                        label Password
+                        input(name="user[password]", type="password")
+            p(class="d-flex flex-row")
+                button(type="submit" class="btn btn-primary" form="mainLogin") Log Ind
+                a(href="/admin")
+                    button(class="btn btn-secondary" style="margin-left: 2em") Admin
