@@ -1,21 +1,22 @@
 extends layout.pug
 block body
     if(authenticated)
-        div(class="container")
-            input#hiddenInputForUserAmount(hidden value=users)
-            table(class="table")
-                thead
-                    tr
-                        th Emne
-                        //TODO add th Kategori???
-                        th Dato
-                        th Initialer
-                        th Mangler at læse
-                tbody#snytKvitOversigt
-                    if data.snyt
-                        each snyt in data.snyt
-                            tr.clickableKvitRow(data-href=snyt._id onclick='gotoSnytKvit(this)')
-                                td #{snyt.subject}
-                                td #{snyt.created.toLocaleDateString()}
-                                td #{snyt.user}
-                                td #{data.userCount - snyt.readBy.length}
+        if errors.length == 0
+            div(class="container")
+                input#hiddenInputForUserAmount(hidden value=users)
+                table(class="table")
+                    thead
+                        tr
+                            th Emne
+                            //TODO add th Kategori???
+                            th Dato
+                            th Initialer
+                            th Mangler at læse
+                    tbody#snytKvitOversigt
+                        if data.snyt
+                            each snyt in data.snyt
+                                tr.clickableKvitRow(data-href=snyt._id onclick='gotoSnytKvit(this)')
+                                    td #{snyt.subject}
+                                    td #{snyt.created.toLocaleDateString()}
+                                    td #{snyt.user}
+                                    td #{data.userCount - snyt.readBy.length}

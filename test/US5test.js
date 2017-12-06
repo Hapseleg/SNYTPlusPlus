@@ -18,8 +18,8 @@ let should = require('should');
 
 let login_details = {
     user: {
-        email: 'test6@test.dk',
-        password: '123'
+        email: 'test2@test.dk',
+        password: '1234'
     }
 };
 

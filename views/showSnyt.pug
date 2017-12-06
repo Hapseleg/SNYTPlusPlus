@@ -1,66 +1,69 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/snyt/" + data.snyt._id, method="POST")
-            div(class="row")
-                div(class="col-2")
-                    fieldset
-                    ul(type="none")
-                        li
-                        a(name="snyt[edok]" href=data.snyt.edok) e-Dok
-                        li
-                        label Dato
-                            input(type="text" name="snyt[created]" value=data.snyt.created.toLocaleDateString() disabled=true)
-                        li
-                        label Initialer
-                            input(type="text" name="snyt[user]", value=data.snyt.user disabled = true)
-                        li
-                        label Kategori
-                            input(type="text" name="snyt[category]" value=data.snyt.category disabled = true)
-                        li
-                        a(href="/editsnyt/" + data.snyt._id)
-                            button(type="button" class="btn btn-primary") Rediger SNYT
-                        li
-                        br
-                        a(href="/updateSnyt/" + data.snyt._id)
-                            button(type="button" class="btn btn-primary") Update SNYT
-                        br
-                        br
-                        li
-                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
-                        br
-                        if (data.userHasNotRead)
+        if errors.length == 0
+            form(action="/snyt/" + data.snyt._id, method="POST")
+                div(class="row")
+                    div(class="col-2")
+                        fieldset
+                        ul(type="none")
                             li
-                            br
-                            button(type="submit" class="btn btn-primary") Kvitter
-                        else
+                            a(name="snyt[edok]" href=data.snyt.edok) e-Dok
                             li
-                            label Du har allerede læsekvitteret
-
-                div(class="col-10")
-                    ul(type="none")
-                        li
-                            label Emne
-                                input(type="text" name="snyt[subject]" value=data.snyt.subject disabled = true style="width: 1073px;")
-                        if(data.snytHasSubSnyt)
-                            li
-                                textarea(rows="15" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
-                        else
-                            li
-                                textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
-    if(data.snytHasSubSnyt)
-        each sub in data.subSnytsInSnyt
-            div(class="row")
-                div(class="col-2")
-                    ul(type="none")
-                        li
                             label Dato
-                                input(type="text" name="snyt[created]" value=sub.created.toLocaleDateString() disabled=true)
+                                input(type="text" name="snyt[created]" value=data.snyt.created.toLocaleDateString() disabled=true)
                             li
                             label Initialer
-                                input(type="text" name="snyt[user]", value=sub.user disabled = true)
+                                input(type="text" name="snyt[user]", value=data.snyt.user disabled = true)
+                            li
+                            label Kategori
+                                input(type="text" name="snyt[category]" value=data.snyt.category disabled = true)
 
-                div(class="col-10")
-                    ul(type="none")
-                        li
-                            textarea(rows="10" cols="150" disabled = true name="snyt[text]").form-control=sub.text
+                            if(me.initials == data.snyt.user)
+                                li
+                                a(href="/editsnyt/" + data.snyt._id)
+                                    button(type="button" class="btn btn-primary") Rediger SNYT
+                                li
+                                br
+                                a(href="/updateSnyt/" + data.snyt._id)
+                                    button(type="button" class="btn btn-primary") Update SNYT
+                            br
+                            br
+                            li
+                                button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
+                            br
+                            if (data.notUserRead)
+                                li
+                                br
+                                button(type="submit" class="btn btn-primary") Kvitter
+                            else
+                                li
+                                label Du har allerede læsekvitteret
+
+                    div(class="col-10")
+                        ul(type="none")
+                            li
+                                label Emne
+                                    input(type="text" name="snyt[subject]" value=data.snyt.subject disabled = true style="width: 1073px;")
+                            if(data.hasSubSnyt)
+                                li
+                                    textarea(rows="15" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
+                            else
+                                li
+                                    textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
+            if(data.hasSubSnyt)
+                each sub in data.subSnytsInSnyt
+                    div(class="row")
+                        div(class="col-2")
+                            ul(type="none")
+                                li
+                                    label Dato
+                                        input(type="text" name="snyt[created]" value=sub.created.toLocaleDateString() disabled=true)
+                                    li
+                                    label Initialer
+                                        input(type="text" name="snyt[user]", value=sub.user disabled = true)
+
+                        div(class="col-10")
+                            ul(type="none")
+                                li
+                                    textarea(rows="10" cols="150" disabled = true name="snyt[text]").form-control=sub.text

@@ -1,27 +1,28 @@
 extends layout.pug
 block body
     if(authenticated)
-        div(style="padding:0em 2em 0em 2em")
-            table(class="table")
-                thead
-                    tr
-                        th(onclick="sortTable(0)" style="cursor:pointer") Emne
-                        th(onclick="sortTable(1)" style="cursor:pointer") Kategori
-                        th(onclick="sortTable(2)" style="cursor:pointer") Dato
-                        th(onclick="sortTable(3)" style="cursor:pointer") Initialer
-                        th(onclick="sortTable(4)" style="cursor:pointer") Læst
-                tbody#snytOversigt
-                    if data
-                        each snyt in data
-                            tr.clickableRow(data-href=snyt._id onclick='gotoSnyt(this)')
-                                td #{snyt.subject}
-                                td #{snyt.category}
-                                td #{snyt.created.toLocaleDateString()}
-                                td #{snyt.user}
-                                if ( snyt.readBy.indexOf(me._id) >= 0 )
-                                    td  X
-                                else
-                                    td
+        if errors && errors.length == 0
+            div(style="padding:0em 2em 0em 2em")
+                table(class="table")
+                    thead
+                        tr
+                            th(onclick="sortTable(0)" style="cursor:pointer") Emne
+                            th(onclick="sortTable(1)" style="cursor:pointer") Kategori
+                            th(onclick="sortTable(2)" style="cursor:pointer") Dato
+                            th(onclick="sortTable(3)" style="cursor:pointer") Initialer
+                            th(onclick="sortTable(4)" style="cursor:pointer") Læst
+                    tbody#snytOversigt
+                        if data
+                            each snyt in data.snyt
+                                tr.clickableRow(data-href=snyt._id onclick='gotoSnyt(this)')
+                                    td #{snyt.subject}
+                                    td #{snyt.category}
+                                    td #{snyt.created.toLocaleDateString()}
+                                    td #{snyt.user}
+                                    if ( snyt.readBy.indexOf(me._id) >= 0 )
+                                        td  X
+                                    else
+                                        td
 
     else
         //Hvis man ikke er logget ind kommer det her:

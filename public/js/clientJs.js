@@ -1,24 +1,27 @@
 $(document).ready(function() {
-	var now = new Date();
-	var dayNow = ('0' + now.getDate()).slice(-2);
-	var monthNow = ('0' + (now.getMonth() + 1)).slice(-2);
-	var today = now.getFullYear() + '-' + (monthNow) + '-' + (dayNow);
-	$('#advDateTo').val(today);
-	
-	var before = new Date();
-	before.setMonth(before.getMonth() - 2);
-	var dayBefore = ('0' + before.getDate()).slice(-2);
-	var monthBefore = ('0' + (before.getMonth() + 1)).slice(-2);
-	var dateBefore = before.getFullYear() + '-' + (monthBefore) + '-' + (dayBefore);
-	$('#advDateFrom').val(dateBefore);
-	
-	$('#advancedSearch').on('keyup keypress', function(e) {
-		var keyCode = e.keyCode || e.which;
-		if(keyCode === 13) {
-			e.preventDefault();
-		}
-	});
-	
+    var now = new Date();
+    var dayNow = ("0" + now.getDate()).slice(-2);
+    var monthNow = ("0" + (now.getMonth() + 1)).slice(-2);
+    var today = now.getFullYear()+"-"+(monthNow)+"-"+(dayNow) ;
+    $('#advDateTo').val(today);
+
+    var before = new Date();
+    before.setMonth(before.getMonth() - 2);
+    var dayBefore = ("0" + before.getDate()).slice(-2);
+    var monthBefore = ("0" + (before.getMonth() + 1)).slice(-2);
+    var dateBefore = before.getFullYear() + "-" + (monthBefore) + "-" + (dayBefore);
+    $("#advDateFrom").val(dateBefore);
+
+    $('#advancedSearch').on('keyup keypress', function(e) {
+        var keyCode = e.keyCode || e.which;
+        if (keyCode === 13) {
+            e.preventDefault();
+        }
+    });
+
+    if(location.pathname == "/") {
+    	advancedSearch();
+	}
 	// Bind enter til søgefunktion
 	$(document).keypress(function(e) {
 		if(e.which == 13) {
@@ -30,7 +33,7 @@ $(document).ready(function() {
 			}
 		}
 	});
-	
+
 });
 
 function regularSearch() {
@@ -46,11 +49,6 @@ function regularSearch() {
 }
 
 function advancedSearch() {
-	// var category = $('#advCategory option:selected').val();
-	// var searchText = $('#advText').val();
-	// var dateFrom = $('#advDateFrom').val();
-	// var dateTo = $('#advDateTo').val();
-	// var read = $('input[name=advRadioButtons]:checked').val();
 	$('#advSearch').submit();
 	$('#advancedSearch').modal('hide');
 }
@@ -90,7 +88,7 @@ function createUser() {
 	var password = $('#password').val();
 	
 	// validering
-	
+
 	if(!fornavn.length > 0) {
 		alert('Fornavn skal udfyldes');
 	}

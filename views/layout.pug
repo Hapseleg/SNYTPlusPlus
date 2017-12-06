@@ -98,12 +98,13 @@ html
                         button(type="button" class="btn btn-primary" onClick="advancedSearch();" form="advSearch"
                         id="searchAdv") Søg
                         button(type="button" class="btn btn-secondary" data-dismiss="modal") Luk
+        if message
+            #messageDiv
+                h4 #{message}
         if errors
             if errors.length > 0
-                div#errorDiv
-                    p Der skete følgende fejl
-                    ul#errorList
-                        each err in errors
-                            li= err
+                ul#errorList
+                    each err in errors
+                        li= err
 
         block body

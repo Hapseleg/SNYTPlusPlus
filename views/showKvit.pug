@@ -1,43 +1,43 @@
 extends layout.pug
 block body
     if(authenticated)
-        div(class="row")
-            div(class="col-2")
-                fieldset
-                ul(type="none")
-                    li
-                        button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
-                    li
-                    a(name="snyt[edok]" href=data.snyt.edok) e-Dok
-                        a(href="/snyt/" + snyt.id)
-                            button(type="button" class="btn btn-primary") Gå til SNYT
-                    li
-                    a(name="snyt[edok]" href=snyt.edok) e-Dok
-                    li
-                    label Dato
-                        input(type="text" name="snyt[created]" value=data.snyt.created.toLocaleDateString() disabled=true)
-                    li
-                    label Initialer
-                        input(type="text" name="snyt[user]", value=data.snyt.user disabled = true)
-                    li
-                    label Kategori
-                        input(type="text" name="snyt[category]" value=data.snyt.category disabled = true)
+        if errors.length == 0
+            div(class="row")
+                div(class="col-2")
+                    fieldset
+                    ul(type="none")
+                        li
+                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
+                        li
+                            a(href="/snyt/" + data.snyt.id)
+                                button(type="button" class="btn btn-primary") Gå til SNYT
+                        li
+                        a(name="snyt[edok]" href=data.snyt.edok) e-Dok
+                        li
+                        label Dato
+                            input(type="text" name="snyt[created]" value=data.snyt.created.toLocaleDateString() disabled=true)
+                        li
+                        label Initialer
+                            input(type="text" name="snyt[user]", value=data.snyt.user disabled = true)
+                        li
+                        label Kategori
+                            input(type="text" name="snyt[category]" value=data.snyt.category disabled = true)
 
-            div(class="col-7")
-                ul(type="none")
-                    li
-                        input(type="text" name="snyt[subject]" value=data.snyt.subject disabled = true)
-                    li
-                        textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
+                div(class="col-7")
+                    ul(type="none")
+                        li
+                            input(type="text" name="snyt[subject]" value=data.snyt.subject disabled = true)
+                        li
+                            textarea(rows="20" cols="150" disabled = true name="snyt[text]").form-control=data.snyt.text
 
-            .col-3
-                input#kvitListJ(hidden value=data.snyt.readBy)
-                ul(type="none")
-                    li
-                        input(type="text" value="Mangler at læsekvittere" disabled = true)
-                ul#kvitList(type="none")
-                    each user in data.allUsersExcept
-                        li #{user.first} #{user.last} (#{user.initials})
+                .col-3
+                    input#kvitListJ(hidden value=data.snyt.readBy)
+                    ul(type="none")
+                        li
+                            input(type="text" value="Mangler at læsekvittere" disabled = true)
+                    ul#kvitList(type="none")
+                        each user in data.allUsersExcept
+                            li #{user.first} #{user.last} (#{user.initials})
 
 
 
