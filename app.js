@@ -147,10 +147,7 @@ app.post('/', function(req, res) {
 			req.session.loggedIn = doc._id;
 			returnJson.message = 'Du blev logget ind';
 		}
-		res.render('index', returnJson, function(err, html) {
-            console.log(req);
-            res.send(html);
-        });
+		res.render('index', returnJson);
 	});
 });
 

@@ -1,10 +1,7 @@
 let assert = require('chai').assert;
 let request = require('supertest');
 let app = require("../app").app;
-let sinon = require('sinon');
-let pug = require('pug');
-
-let expect = require('chai').expect;
+let shutdown = require("../app").shutdown;
 
 let agent = request.agent(app);
 
@@ -15,29 +12,44 @@ let login = {
     }
 };
 
-describe('Search', function() {
+let regEx = new RegExp(/\<tr class=\"clickableRow\"/, "g");
+
+describe('Søgning', function() {
 
     before(function(done) {
         agent.post("/")
             .type("form")
             .send(login)
             .end(function(err, res) {
-                assert.isNotNull(res.headers["set-cookie"]);
                 done();
             });
     });
 
-    it("test", function(done) {
-        var spy = sinon.spy(pug, '__express');
+    it("GET til /search/asdasd skal ikke returnere nogle clickableRows", function(done) {
 
-        agent.get("/search/nomatch")
+        agent.get("/search/asdasd")
             .end(function(err, res) {
-                console.log(res);
+                let matches = res.text.match(regEx);
+                assert.equal(matches, null);
                 done();
             });
     });
 
-    after(function() {
-        agent.get("/logout");
+    it("GET til /search/hej skal returnere 3 clickableRows", function(done) {
+        agent.get("/search/hej")
+            .end(function(err, res) {
+                let matches = res.text.match(regEx);
+                assert.equal(matches.length, 3);
+                done();
+            });
     });
+
+    after(function(done) {
+        agent.get('/logout')
+            .end(function(err, res) {
+                shutdown();
+            });
+        done();
+    })
 });
+
