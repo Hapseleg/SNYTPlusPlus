@@ -1,51 +1,52 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/editSnyt", method="POST")
-            div(class="row")
-                div(class="col-2")
-                    fieldset
-                    ul(type="none")
-                        li
-                            label e-Dok
-                                input(type="text" name="snyt[edok]" value=data.edok)
-                        li
-                        label Dato
-                            input(type="date" name="snyt[created]" value=data.createdDate)
-                        li
-                        label Initialer
-                            input(type="text" name="snyt[user]", readonly value=me.initials)
-                        li
-                        label Kategori
-                        div(class="cats")
-                            select(name="snyt[category]")
-                                option(value="AC") AC
-                                option(value="Logistik") Logistik
-                                option(value="Tovholder") Tovholder
-                                option(value="Hygiejne") Hygiejne
-                                option(value="Levering") Levering
-                                option(value="Reklamation") Reklamation
-                                option(value="IT") IT
-                                option(value="Klinisk Forsøg") Klinisk Forsøg
-                                option(value="Produktion") Produktion
-                        br
-                        li
-                            button(type="submit" class="btn btn-primary") OK
-                            button(type="button" class="btn btn-primary" onclick="goBack();" style="margin-left: " +
-                            "5px;") Gå tilbage
+        if errors.length == 0
+            form(action="/editSnyt", method="POST")
+                div(class="row")
+                    div(class="col-2")
+                        fieldset
+                        ul(type="none")
+                            li
+                                label e-Dok
+                                    input(type="text" name="snyt[edok]" value=data.snyt.edok)
+                            li
+                            label Dato
+                                input(type="date" name="snyt[created]" value=data.snyt.createdDate)
+                            li
+                            label Initialer
+                                input(type="text" name="snyt[user]", readonly value=me.initials)
+                            li
+                            label Kategori
+                            div(class="cats")
+                                select(name="snyt[category]")
+                                    option(value="AC") AC
+                                    option(value="Logistik") Logistik
+                                    option(value="Tovholder") Tovholder
+                                    option(value="Hygiejne") Hygiejne
+                                    option(value="Levering") Levering
+                                    option(value="Reklamation") Reklamation
+                                    option(value="IT") IT
+                                    option(value="Klinisk Forsøg") Klinisk Forsøg
+                                    option(value="Produktion") Produktion
+                            br
+                            li
+                                button(type="submit" class="btn btn-primary") OK
+                                button(type="button" class="btn btn-primary" onclick="goBack();" style="margin-left: " +
+                                "5px;") Gå tilbage
 
-                        input(type="text" name="snyt[_id]" value=data._id hidden)
+                            input(type="text" name="snyt[_id]" value=data.snyt._id hidden)
 
-                div(class="col-10")
-                    ul(type="none")
-                        li
-                            label Emne
-                            input(type="text" name="snyt[subject]" value=data.subject style="width: 1073px;")
-                        br
-                        li
-                            textarea(rows="20" cols="150" name="snyt[text]").form-control=data.text
+                    div(class="col-10")
+                        ul(type="none")
+                            li
+                                label Emne
+                                input(type="text" name="snyt[subject]" value=data.snyt.subject style="width: 1073px;")
+                            br
+                            li
+                                textarea(rows="20" cols="150" name="snyt[text]").form-control=data.snyt.text
 
     script.
         $(document).ready(function () {
-            $('option[value="#{data.category}"]').prop("selected", true);
+            $('option[value="#{data.snyt.category}"]').prop("selected", true);
         })

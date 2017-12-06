@@ -1,28 +1,29 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/updateSnyt/"+data.snytid, method="POST")
-            div(class="row")
-                div(class="col-2")
-                    fieldset
-                    ul(type="none")
+        if errors.length == 0
+            form(action="/updateSnyt/"+data.snytid, method="POST")
+                div(class="row")
+                    div(class="col-2")
+                        fieldset
+                        ul(type="none")
 
-                        li
-                        label Dato
-                            input(type="date" name="subsnyt[created]" value=data.date)
-                        li
-                        label Initialer
-                            input(type="text" name="subsnyt[user]" readonly value=me.initials)
+                            li
+                            label Dato
+                                input(type="date" name="subsnyt[created]" value=data.date)
+                            li
+                            label Initialer
+                                input(type="text" name="subsnyt[user]" readonly value=me.initials)
 
-                        li
-                            button(type="submit" class="btn btn-primary") OK
-                        input(type="text" name="subsnyt[_id]" value=data.snytid hidden)
-                        br
-                        li
-                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
+                            li
+                                button(type="submit" class="btn btn-primary") OK
+                            input(type="text" name="subsnyt[_id]" value=data.snytid hidden)
+                            br
+                            li
+                                button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
 
-                div(class="col-10")
-                    ul(type="none")
-                        li
-                            textarea(rows="20" cols="150" name="subsnyt[text]")
+                    div(class="col-10")
+                        ul(type="none")
+                            li
+                                textarea(rows="20" cols="150" name="subsnyt[text]")
 

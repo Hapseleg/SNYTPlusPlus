@@ -1,46 +1,47 @@
 extends layout.pug
 block body
     if(authenticated)
-        form(action="/opretsnyt", method="POST")
-            div(class="row")
-                div(class="col-2")
-                    fieldset
-                    ul(type="none")
-                        li
-                        label e-Dok
-                            input(type="text" name="snyt[edok]")
-                        li
-                        label Dato
-                            input#advDateFrom(type="date" name="snyt[created]" value=data)
-                        li
-                        label Initialer
-                            input(type="text" name="snyt[user]" readonly value=me.initials)
-                        li
-                        label Kategori
-                            //input(type="text" name="snyt[category]")
-                            select(name="snyt[category]")
-                                option(value="AC") AC
-                                option(value="Logistik") Logistik
-                                option(value="Tovholder") Tovholder
-                                option(value="Hygiejne") Hygiejne
-                                option(value="Levering") Levering
-                                option(value="Reklamation") Reklamation
-                                option(value="IT") IT
-                                option(value="Klinisk Forsøg") Klinisk Forsøg
-                                option(value="Produktion") Produktion
+        if errors.length == 0
+            form(action="/opretsnyt", method="POST")
+                div(class="row")
+                    div(class="col-2")
+                        fieldset
+                        ul(type="none")
+                            li
+                            label e-Dok
+                                input(type="text" name="snyt[edok]")
+                            li
+                            label Dato
+                                input#advDateFrom(type="date" name="snyt[created]" value=data.date)
+                            li
+                            label Initialer
+                                input(type="text" name="snyt[user]" readonly value=me.initials)
+                            li
+                            label Kategori
+                                //input(type="text" name="snyt[category]")
+                                select(name="snyt[category]")
+                                    option(value="AC") AC
+                                    option(value="Logistik") Logistik
+                                    option(value="Tovholder") Tovholder
+                                    option(value="Hygiejne") Hygiejne
+                                    option(value="Levering") Levering
+                                    option(value="Reklamation") Reklamation
+                                    option(value="IT") IT
+                                    option(value="Klinisk Forsøg") Klinisk Forsøg
+                                    option(value="Produktion") Produktion
 
 
-                        li
-                            button(type="submit" class="btn btn-primary") Gem
-                        br
-                        li
-                            button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
+                            li
+                                button(type="submit" class="btn btn-primary") Gem
+                            br
+                            li
+                                button(type="button" class="btn btn-primary" onclick="goBack();") Gå tilbage
 
 
-                div(class="col-10")
-                    ul(type="none")
-                        li
-                            label Emne
-                                input(type="text" name="snyt[subject]" style="width: 1073px;")
-                        li
-                            textarea(name="snyt[text]" rows="20" cols="150")
+                    div(class="col-10")
+                        ul(type="none")
+                            li
+                                label Emne
+                                    input(type="text" name="snyt[subject]" style="width: 1073px;")
+                            li
+                                textarea(name="snyt[text]" rows="20" cols="150")
