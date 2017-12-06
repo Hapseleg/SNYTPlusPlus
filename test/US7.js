@@ -1,4 +1,3 @@
-//TODO DENNE TEST FUNGERER IKKE MERE
 process.env.NODE_ENV = 'test';
 var assert = require('chai').assert;
 var chai = require('chai');
@@ -71,10 +70,11 @@ describe('US7: create an update to snyt', function () {
                     })
             });
     });
-        it('snyt contains', function () {
+        it('snyt contains', function (done) {
             Snyt.findById(sejeId).exec(function(err, doc) {
                 console.log(doc);
                 assert.isNotEmpty(doc.idSubSnyts);
+                done();
             });
         });
     });

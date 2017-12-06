@@ -1,9 +1,10 @@
-//TODO DENNE TEST FUNGERER IKKE MERE
 var assert = require('chai').assert;
 var chai = require('chai');
 var chaiHttp = require('chai-http');
 chai.use(chaiHttp);
-var app = "http://localhost:1337";
+var request = require('supertest');
+//var app = "http://localhost:1337";
+var app = require('../app').app;
 var login_details = {
     user: {
         email: 'test6@test.dk',
@@ -11,8 +12,8 @@ var login_details = {
     }
 };
 
-describe('er han logget ind', function () {
-    var agent = chai.request.agent(app);
+describe('US8: er han logget ind', function () {
+    var agent = request.agent(app);
     describe('luk ned login', function () {
         it('Should be logged in', function (done) {
             agent
@@ -20,8 +21,8 @@ describe('er han logget ind', function () {
                 .type('form')
                 .send(login_details)
                 .end(function (err, res) {
-                    console.log(res.request);
-                    assert.isAbove(res.request.cookies.length, 1);
+                    console.log(res.headers["set-cookie"]);
+                    assert.isNotEmpty(res.headers["set-cookie"]);
                     done();
                 });
         });
