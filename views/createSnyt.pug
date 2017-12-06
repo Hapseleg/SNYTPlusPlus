@@ -2,7 +2,7 @@ extends layout.pug
 block body
     if(authenticated)
         if errors.length == 0
-            form(action="/opretsnyt", method="POST")
+            form(action="/opretsnyt", method="POST" enctype = "multipart/form-data")
                 div(class="row")
                     div(class="col-2")
                         fieldset
@@ -29,7 +29,9 @@ block body
                                     option(value="IT") IT
                                     option(value="Klinisk Forsøg") Klinisk Forsøg
                                     option(value="Produktion") Produktion
-
+                            li
+                                label Billeder
+                                    input(name='pic', type='file' multiple)
 
                             li
                                 button(type="submit" class="btn btn-primary") Gem

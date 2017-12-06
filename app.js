@@ -3,16 +3,18 @@
 //***************************************************************************
 
 var express = require('express'),
-	bodyParser = require('body-parser'),
-	cookieParser = require('cookie-parser'),
-	cookieSession = require('cookie-session'),
-	morgan = require('morgan'),
-	mongoose = require('mongoose'),
-	rp = require('request-promise'),
-	config = require('config'),
-	SubSnyt = require('./models/Subsnyt.model'),
-	Snyt = require('./models/Snyt.model'),
-	User = require('./models/User.model');
+    bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
+    cookieSession = require('cookie-session'),
+    morgan = require('morgan'),
+    mongoose = require('mongoose'),
+    multer = require('multer'),
+    upload = multer({ dest: 'public/uploads'}),
+    rp = require('request-promise'),
+    config = require('config'),
+    SubSnyt = require('./models/Subsnyt.model'),
+    Snyt = require('./models/Snyt.model'),
+    User = require('./models/User.model');
 
 //***************************************************************************
 // Set up application
@@ -22,6 +24,7 @@ var express = require('express'),
 
 var app = express();
 app.use(express.static('public'));
+app.use(express.static('uploads'));
 
 // View options
 app.set('view engine', 'pug');
@@ -111,6 +114,7 @@ app.use(function(req, res, next) {
 	next();
 });
 
+
 //***************************************************************************
 // Routes
 //***************************************************************************
@@ -199,32 +203,30 @@ app.get('/opretsnyt', function(req, res) {
  * Recieve SNYT data from user and create the document in mongo
  * Then redirect to /
  */
-app.post('/opretsnyt', function(req, res) {
-	var returnJson = {
-		errors: [],
-		message: null,
-		data: null
-	};
-	console.log(req.body);
-	var newSnyt = new Snyt();
-	newSnyt.subject = req.body.snyt.subject;
-	newSnyt.category = req.body.snyt.category;
-	newSnyt.text = req.body.snyt.text;
-	newSnyt.user = req.body.snyt.user;
-	newSnyt.created = req.body.snyt.created;
-	newSnyt.edok = req.body.snyt.edok;
-	// var AddAllUsersToNewSnyt = function() {
-	//     User.find().exec().then(function (user) {
-	//         var a = [];
-	//         for (var j in user) {
-	//             console.log(j + '_:_ '+user[j]);
-	//             a.push(user[j]._id);
-	//         }
-	//         newSnyt.notReadBy = a;
-	//     });
-	// }();
+//app.post('/opretsnyt',upload.single('pic'),function (req,res) {
+app.post('/opretsnyt',upload.array('pic'),function (req,res) {
+    // console.log(req.files);
 
-	// console.log(req.body.snyt.created);
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : null
+    };
+
+    // console.log(req.body);
+    var newSnyt = new Snyt();
+    newSnyt.subject = req.body.snyt.subject;
+    newSnyt.category = req.body.snyt.category;
+    newSnyt.text = req.body.snyt.text;
+    newSnyt.user = req.body.snyt.user;
+    newSnyt.created = req.body.snyt.created;
+    newSnyt.edok = req.body.snyt.edok;
+
+    // newSnyt.pictures.push({filename: req.file.filename, orgName: req.file.originalname});
+    for(p in req.files){
+        newSnyt.pictures.push(req.files[p].filename);
+    }
+    console.log(newSnyt);
 
 	newSnyt.save(function(err, snyt) {
 		if(err) {
@@ -240,18 +242,18 @@ app.post('/opretsnyt', function(req, res) {
 app.get('/updateSnyt/:id', function(req, res) {
 	//mangler sikkerhed: man kan stadig bypass ved at gå på url'en (altså hvis man ikke er den bruger der har oprettet SNYT'en) men vi synes ikke det er nødvendigt..
 
-	var returnJson = {
-		errors: [],
-		message: null,
-		data: {
-			snytid: null,
-			date: null
-		}
-	};
-	let today = new Date();
-	let yyyy = today.getFullYear();
-	let mm = today.getMonth() + 1;
-	let dd = today.getDate();
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            snytid : null,
+            date : null
+        }
+    };
+    let today = new Date();
+    let yyyy = today.getFullYear();
+    let mm = today.getMonth()+1;
+    let dd = today.getDate();
 
 	if(dd < 10) {
 		dd = '0' + dd;
@@ -298,39 +300,39 @@ app.post('/updateSnyt/:id', function(req, res) {
 /*
  * SNYT Read and mark as læsekvitteret routes
  */
-app.route('/snyt/:id').get(function(req, res) {
-	var returnJson = {
-		errors: [],
-		message: null,
-		data: {
-			userID: req.session.loggedIn,
-			notUserRead: true,
-			hasSubSnyt: false,
-			snyt: null,
-			subSnytsInSnyt: null
-		}
-	};
-	Snyt.findById(req.params.id).exec().then(function(doc) {
-		if(doc.readBy.includes(returnJson.data.userID)) {
-			returnJson.data.notUserRead = false;
-		}
-		if(doc.idSubSnyts.length > 0) {
-			returnJson.data.hasSubSnyt = true;
-		}
-		SubSnyt.find({'$or': [{'_id': doc.idSubSnyts}]}).exec(function(err, subdoc) {
-			if(err) {
-				returnJson.errors.push('Der skete en fejl under inlæsning af denne SNYT');
+app.route('/snyt/:id').get(function (req, res) {
+    var returnJson = {
+        errors : [],
+        message : null,
+        data : {
+            userID : req.session.loggedIn,
+            notUserRead : true,
+            hasSubSnyt : false,
+            snyt : null,
+            subSnytsInSnyt : null
+        }
+    };
+    Snyt.findById(req.params.id).exec().then(function(doc) {
+        if(doc.readBy.includes(returnJson.data.userID)){
+            returnJson.data.notUserRead = false;
+        }
+        if(doc.idSubSnyts.length>0){
+            returnJson.data.hasSubSnyt = true;
+        }
+        SubSnyt.find({'$or':[{'_id':doc.idSubSnyts}]}).exec(function (err, subdoc) {
+            if(err){
+                returnJson.errors.push('Der skete en fejl under inlæsning af denne SNYT');
 				returnJson.message = 'Der gik noget galt';
-			}
-			returnJson.data.subSnytsInSnyt = subdoc;
-			returnJson.data.snyt = doc;
-			res.render('showSnyt', returnJson);
-		});
-	}).catch(function(err) {
-		returnJson.errors.push('Der skete en fejl under inlæsning af denne SNYT');
+            }
+            returnJson.data.subSnytsInSnyt = subdoc;
+            returnJson.data.snyt = doc;
+            console.log(doc);res.render('showSnyt', returnJson);
+        });
+    }).catch(function (err) {
+        returnJson.errors.push('Der skete en fejl under inlæsning af denne SNYT');
 		returnJson.message = 'Der gik noget galt';
-		res.render('showSnyt', returnJson);
-	});
+        res.render('showSnyt', returnJson);
+    });
 });
 
 // POST -  Mark a SNYT as læsekvitteret -> redirect to /
@@ -369,32 +371,31 @@ app.post('/editSnyt', function(req, res) {
 		}
 	};
 
-	//sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
-	if(res.locals.me.initials == doc.user) {
-		var newSnyt = new Snyt();
-		newSnyt.subject = req.body.snyt.subject;
-		newSnyt.category = req.body.snyt.category;
-		newSnyt.text = req.body.snyt.text;
-		newSnyt.user = req.body.snyt.user;
-		newSnyt.created = req.body.snyt.created;
-		newSnyt.edok = req.body.snyt.edok;
-		newSnyt._id = req.body.snyt._id;
+    //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
 
-		Snyt.findOneAndUpdate({'_id': newSnyt._id}, {
-			'subject': newSnyt.subject,
-			'category': newSnyt.category,
-			'text': newSnyt.text,
-			'user': newSnyt.user,
-			'created': newSnyt.created,
-			'edok': newSnyt.edok
-		}, {new: true}).exec().then(function(doc) {
-			res.redirect('/snyt/' + req.body.snyt._id);
-		}).catch(function(err) {
-			returnJson.errors.push('Der skete en fejl da vi forsøgte at gemme din redigering');
-			returnJson.message = 'Der gik noget galt';
-			res.render('showSnyt', returnJson);
-		});
-	}
+        var newSnyt = new Snyt();
+        newSnyt.subject = req.body.snyt.subject;
+        newSnyt.category = req.body.snyt.category;
+        newSnyt.text = req.body.snyt.text;
+        newSnyt.user = req.body.snyt.user;
+        newSnyt.created = req.body.snyt.created;
+        newSnyt.edok = req.body.snyt.edok;
+        newSnyt._id = req.body.snyt._id;
+
+        Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok}, {new:true}).exec().then(function(doc) {
+            if(res.locals.me.initials == doc.user){
+                returnJson.data = [].push(doc);
+                console.log(returnJson.data);
+                res.render('index', returnJson);
+            }
+            else{
+                res.redirect('/');
+            }
+
+        }).catch(function (err) {
+            returnJson.errors.push(err);
+            res.render('index', returnJson);
+        });
 });
 
 /*
@@ -435,6 +436,18 @@ app.get('/editSnyt/:id', function(req, res) {
 		returnJson.errors.push(err);
 		res.render('index', returnJson);
 	});
+});
+
+app.post('/deletePictures', function(req, res) {
+    //$pop
+    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pop: {pictures: req.body.pics }})
+        .catch(function (err) {
+            returnJson.errors.push(err);
+            res.render('index', returnJson);
+        });
+
+    // Snyt.find({"_id" : mongoose.Types.ObjectId(req.body.id)})
+    // console.log(req.body);
 });
 
 //----------------------------------------------
