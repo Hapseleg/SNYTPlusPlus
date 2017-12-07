@@ -25,9 +25,9 @@ describe('Søgning', function() {
             });
     });
 
-    it("GET til /search/asdasdaasdas skal ikke returnere nogle clickableRows", function(done) {
+    it("GET til /search/sdfnklsdkldgsdfjksdjksdfklsdflhksldfkl skal ikke returnere nogle clickableRows", function(done) {
 
-        agent.get("/search/asdasdaasdas")
+        agent.get("/search/sdfnklsdkldgsdfjksdjksdfklsdflhksldfkl")
             .end(function(err, res) {
                 let matches = res.text.match(regEx);
                 assert.equal(matches, null);

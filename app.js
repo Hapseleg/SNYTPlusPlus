@@ -488,9 +488,8 @@ app.get('/search/:text', function(req, res) {
     var words = req.params.text.split(" ");
     var regexs = [];
     words.forEach(function(word) {
-        regexs.push(new RegExp("^.*" + word + ".*$", "i"));
+        regexs.push(new RegExp("\\b(" + word + ")" + "\\b", "i"));
     });
-    var reg = new RegExp(".*" + req.params.text + ".*", "i");
     var subjectRegs = [];
     regexs.forEach(function(i) {
         subjectRegs.push({"subject" : i});
@@ -559,7 +558,7 @@ app.post('/search', function(req, res) {
         var words = req.body.text.split(" ");
         var regexs = [];
         words.forEach(function(word) {
-            regexs.push(new RegExp("^.*" + word + ".*$", "i"));
+            regexs.push(new RegExp("\\b(" + word + ")" + "\\b", "i"));
         });
         var subjectRegs = [];
         regexs.forEach(function(i) {
@@ -663,47 +662,49 @@ app.post('/admin', function(req, res) {
 		if(err) {
 			returnJson.errors.push('Der skete en fejl på databasen');
 		}
-		if(doc) {
+		if(doc.length > 0) {
 			returnJson.errors.push('Bruger med denne email eksisterer allerede');
 		} else {
 			returnJson.message = 'Brugeren blev gemt';
 		}
-	});
-	User.find({'initials': req.body.user.initials}).exec(function(err, doc) {
-		if(err) {
-			returnJson.errors.push('Der skete en fejl på databasen');
-		}
-		if(doc) {
-			returnJson.errors.push('Bruger med disse initialer eksisterer allerede');
-		}
-	});
-	if(returnJson.errors.length > 0) {
-		returnJson.message = 'Der gik noget galt';
-		res.json(returnJson);
-	}
-	var newUser = new User();
-	newUser.first = req.body.user.first;
-	newUser.last = req.body.user.last;
-	newUser.initials = req.body.user.initials;
-	newUser.email = req.body.user.email;
-	newUser.password = req.body.user.password;
+        User.find({'initials': req.body.user.initials}).exec(function(err, doc) {
+            if(err) {
+                returnJson.errors.push('Der skete en fejl på databasen');
+            }
+            if(doc.length > 0) {
+                returnJson.errors.push('Bruger med disse initialer eksisterer allerede');
+            }
+			var newUser = new User();
+			newUser.first = req.body.user.first;
+			newUser.last = req.body.user.last;
+			newUser.initials = req.body.user.initials;
+			newUser.email = req.body.user.email;
+			newUser.password = req.body.user.password;
 
-	// var AddNewUserToAllSnyts = function() {
-	//     Snyt.find().exec().then(function (snyt) {
-	//         for (var n in snyt) {
-	//             console.log(n + '_:_ '+snyt[n]);
-	//             snyt[n].notReadBy.push(newUser[n]._id);
-	//         }
-	//     });
-	// }();
-
-	newUser.save(function(err, user) {
-		if(err) {
-			returnJson.errors.push('Kunne ikke gemme');
-		}
+			// var AddNewUserToAllSnyts = function() {
+			//     Snyt.find().exec().then(function (snyt) {
+			//         for (var n in snyt) {
+			//             console.log(n + '_:_ '+snyt[n]);
+			//             snyt[n].notReadBy.push(newUser[n]._id);
+			//         }
+			//     });
+			// }();
+			if(returnJson.errors.length > 0) {
+                returnJson.message = "Der gik noget galt";
+                res.render("admin", returnJson);
+			} else {
+                newUser.save(function(err, user) {
+                    if(err) {
+                        returnJson.errors.push('Kunne ikke gemme');
+                        returnJson.message = "Der gik noget galt";
+                        res.render("admin", returnJson);
+                    } else {
+                        res.redirect('/admin');
+                    }
+                });
+			}
+        });
 	});
-
-	res.redirect('/admin');
 });
 
 /*
@@ -714,7 +715,7 @@ app.post('/admin/user', function(req, res) {
 	var password = req.body.password;
 
 	User.findOne({'email': email, 'password': password}).exec(function(err, doc) {
-		if(!doc) {
+		if(doc.length == 0) {
 			res.json({errors: ['Ingen bruger']});
 		}
 		if(err) {
@@ -753,10 +754,12 @@ app.post('/admin/:userid', function(req, res) {
 					res.render('/admin', returnJson);
 				} else {
 					returnJson.message = 'Bruger gemt';
+                    res.redirect('/admin');
 				}
 			});
+		} else {
+            res.render('admin', returnJson);
 		}
-		res.redirect('/admin');
 	});
 });
 
@@ -769,8 +772,15 @@ app.delete('/admin', function(req, res) {
 		message: null,
 		data: null
 	};
-	User.find({'_id': mongoose.Types.ObjectId(req.body.id)}).remove().exec();
-	res.send();
+	User.find({'_id': mongoose.Types.ObjectId(req.body.id)}).remove(function(err, doc) {
+		if(err || doc.result.n == 0) {
+			returnJson.errors.push("Kunne ikke slette");
+			console.log(doc);
+			res.render("admin", returnJson);
+		} else {
+			res.redirect("/admin");
+		}
+	});
 });
 
 /*
