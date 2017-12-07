@@ -201,7 +201,8 @@ app.get('/opretsnyt', function(req, res) {
  */
 //app.post('/opretsnyt',upload.single('pic'),function (req,res) {
     app.post('/opretsnyt',upload.array('pic'),function (req,res) {
-    // console.log(req.files);var returnJson = {
+    // console.log(req.files);
+		var returnJson = {
         errors : [],
         message : null,
         data : null
@@ -390,8 +391,7 @@ app.post('/editSnyt', function(req, res) {
 			returnJson.message = 'Der gik noget galt';
 			res.render('showSnyt', returnJson);
 		});
-	}
-});
+	});
 
 /*
  *
