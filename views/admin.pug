@@ -102,7 +102,7 @@ html
         else
             div(class="col-lg -1 col-centered input")
                 h1 Admin
-            form(action="/admin/login", method="POST"id="adminLogin")
+            form(action="/admin/login", method="POST" id="adminLogin")
                 fieldset
                     p
                         label Brugernavn
@@ -111,6 +111,6 @@ html
                         label Adgangskode
                         input(name="adminPassword", type="password")
                     p(class="d-flex flex-row")
-                        button(type="submit" class="btn btn-primary"form="adminLogin") Log Ind
-    a(href="/")
+                        button(type="submit" class="btn btn-primary" form="adminLogin") Log Ind
+                    a(href="/")
                         button(class="btn btn-secondary" style="margin-left: 2em") Tilbage
