@@ -29,14 +29,14 @@ describe('Avanceret Søgning', function() {
         agent.post("/search")
             .type("form")
             .send({
-                text : "he",
+                text : "hej",
                 dateFrom : "2017-10-01",
                 dateTo : "2017-12-06",
                 category : ""
             })
             .end(function(err, res) {
                 let matches = res.text.match(regEx);
-                assert.equal(matches.length, 4);
+                assert.equal(matches.length, 3);
                 done();
             });
     });
@@ -45,7 +45,7 @@ describe('Avanceret Søgning', function() {
         agent.post("/search")
             .type("form")
             .send({
-                text : "he",
+                text : "hej",
                 dateFrom : "2017-12-01",
                 dateTo : "2017-12-06",
                 category : ""
@@ -53,7 +53,7 @@ describe('Avanceret Søgning', function() {
             })
             .end(function(err, res) {
                 let matches = res.text.match(regEx);
-                assert.equal(matches.length, 2);
+                assert.equal(matches.length, 1);
                 done();
             });
     });
