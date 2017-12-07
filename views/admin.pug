@@ -100,17 +100,17 @@ html
                                 button.btn.btn-secondary(type='button' id="btnDelete" onclick='deleteUser()') Slet
                                 button.btn.btn-secondary(type='button', data-dismiss='modal') Annuller
         else
-            div(class="col-lg -1 col-centered input")
+            div(class="col-lg-1 col-centered input")
                 h1 Admin
-            form(action="/admin/login", method="POST" id="adminLogin")
-                fieldset
-                    p
-                        label Brugernavn
-                        input(name="adminUsername", type="text")
-                    p
-                        label Adgangskode
-                        input(name="adminPassword", type="password")
-                    p(class="d-flex flex-row")
-                        button(type="submit" class="btn btn-primary" form="adminLogin") Log Ind
+                form(action="/admin/login", method="POST" id="adminLogin")
+                    fieldset
+                        p
+                            label Brugernavn
+                            input(name="adminUsername", type="text")
+                        p
+                            label Adgangskode
+                            input(name="adminPassword", type="password")
+                p(class="d-flex flex-row")
+                    button(type="submit" class="btn btn-primary" form="adminLogin") Log Ind
                     a(href="/")
                         button(class="btn btn-secondary" style="margin-left: 2em") Tilbage

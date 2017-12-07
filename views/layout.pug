@@ -14,10 +14,10 @@ html
         script(src='/js/clientJs.js')
         script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous")
         script(src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous")
-    body(style="padding-right: 30px")
+    body(style="padding-right: 30px;")
         if(authenticated)
             //https://getbootstrap.com/docs/4.0/components/navbar/
-            nav(class="navbar navbar-expand-lg fixed-top navbar-light bg-light" style="padding-right:0px; ")
+            nav(class="navbar navbar-expand-lg fixed-top navbar-light bg-light" style="padding-right:0px;")
                 a(class="navbar-brand" href="/") SNYT++
                 button(class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation")
                     span(class="navbar-toggler-icon")
@@ -40,7 +40,9 @@ html
                             input#hiddenInput(hidden value=me._id)
                             div(class="dropdown-menu" aria-labelledby="navbarDropdown")
                                 a(class="dropdown-item" href="/logout") Log ud
-
+            br
+            br
+            br
         //https://getbootstrap.com/docs/4.0/components/modal/
         div(class="modal" tabindex="-1" role="dialog" id="advancedSearch")
             div(class="modal-dialog" role="document")
@@ -105,5 +107,4 @@ html
                 ul#errorList
                     each err in errors
                         li= err
-
         block body
