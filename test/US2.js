@@ -7,7 +7,7 @@ let agent = request.agent(app);
 
 let login = {
     user : {
-        email : "fuckdet@fuck.dk",
+        email : "hejmeddig@hej.dk",
         password : "123"
     }
 };
@@ -61,9 +61,8 @@ describe('Avanceret Søgning', function() {
     after(function(done) {
         agent.get('/logout')
             .end(function(err, res) {
-                shutdown();
+                done();
             });
-        done();
-    })
+    });
 });
 

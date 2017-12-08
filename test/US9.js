@@ -30,7 +30,7 @@ describe('CRUD bruger', function() {
                 first : "Wrong",
                 last : "Wrong",
                 initials : "CKH",
-                email : "fuckdet@fuck.dk",
+                email : "hejmeddig@hej.dk",
                 password : "123"
             }
         };
@@ -142,8 +142,7 @@ describe('CRUD bruger', function() {
     after(function(done) {
         agent.get('/admin/logout')
             .end(function(err, res) {
-                shutdown();
+                done();
             });
-        done();
     })
 });
