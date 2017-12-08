@@ -365,12 +365,10 @@ app.post('/editSnyt',upload.array('pic'), function(req, res) {
         }
     };
 
-    // TODO SIkkerheds tjek kan eventuelt gøres som under dette
-
-    //  if(res.locals.me.initials != req.body.snyt.user) {
-    //      returnJson.errors.push("Du kan ikke redigere i denne SNYT, da det ikke er dig der har lavet den")
-    //      res.redirect('/snyt/' + req.body.snyt._id)
-    //  }
+     if(res.locals.me.initials != req.body.snyt.user) {
+         returnJson.errors.push("Du kan ikke redigere i denne SNYT, da det ikke er dig der har lavet den")
+         res.redirect('/snyt/' + req.body.snyt._id)
+     }
 
     var newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
@@ -404,19 +402,7 @@ app.post('/editSnyt',upload.array('pic'), function(req, res) {
 
     Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok,$push: {pictures: newSnyt.pictures[0]}}, {new:true}).exec().then(function(doc) {
         //TODO kan kun tilføje et billede af gangen pga hvis man skriver $push: {pictures: newSnyt.pictures} smider den selve arrayet ind i picture array'et der er i databasen (fremfor det der er indeni arrayet)
-
-
-        //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
-        // console.log("FINDONE I EDITSNYT POST:");
-        // console.log(res.locals.me.initials == doc.user);
-        if(res.locals.me.initials == doc.user){
-            returnJson.data.snyt = doc;
-            // console.log(returnJson.data);
-            res.render('showSnyt', returnJson);
-        }
-        else{
-            res.redirect('/snyt/' + req.body.snyt._id);
-        }
+        res.redirect('/snyt/' + req.body.snyt._id);
 
     }).catch(function (err) {
         returnJson.errors.push("Der skete en fejl");
@@ -503,7 +489,7 @@ app.get('/editSnyt/:id', function(req, res) {
 
 app.post('/deletePictures', function(req, res) {
     //$pop
-    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pop: {pictures: req.body.pics }})
+    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pull: {pictures: req.body.pics }})
         .catch(function (err) {
             returnJson.errors.push(err);
             res.render('index', returnJson);
