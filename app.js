@@ -2,7 +2,7 @@
 // Module dependencies
 //***************************************************************************
 
-var express = require('express'),
+let express = require('express'),
     bodyParser = require('body-parser'),
     cookieParser = require('cookie-parser'),
     cookieSession = require('cookie-session'),
@@ -19,9 +19,7 @@ var express = require('express'),
 // Set up application
 //***************************************************************************
 
-//TODO Refactor error handling, så det sker på samme måde i alle ruter
-
-var app = express();
+let app = express();
 app.use(express.static('public'));
 app.use(express.static('uploads'));
 
@@ -33,7 +31,7 @@ app.set('view engine', 'pug');
 
 // config.DBHost has mongoUrl information.
 // if a test database is necessary, we need to change the DBHost in /config/test.json && make sure our tests sets process.env.NODE_ENV = 'test'
-var mongoUrl = config.DBHost;
+let mongoUrl = config.DBHost;
 mongoose.Promise = global.Promise;
 
 // Connect to the mongoDB
@@ -97,10 +95,6 @@ app.use(function(req, res, next) {
         res.locals.authenticated = false;
         next();
     }
-
-    //TODO KUN TIL TEST HVIS DU IKKE HAR ET LOGIN!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // res.locals.authenticated = true;
-    // next();
 });
 
 // Are we authenticated as an admin?
@@ -133,7 +127,7 @@ app.get('/', function(req, res) {
  * else create UNF page
  */
 app.post('/', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: null
@@ -169,7 +163,7 @@ app.get('/logout', function(req, res) {
  * Render create snyt screen
  */
 app.get('/opretsnyt', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -199,16 +193,13 @@ app.get('/opretsnyt', function(req, res) {
  * Recieve SNYT data from user and create the document in mongo
  * Then redirect to /
  */
-//app.post('/opretsnyt',upload.single('pic'),function (req,res) {
 app.post('/opretsnyt',upload.array('pic'),function (req,res) {
-    // console.log(req.files);
-    var returnJson = {
+    let returnJson = {
         errors : [],
         message : null,
         data : null
     };
-    //console.log(req.body);
-    var newSnyt = new Snyt();
+    let newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
     newSnyt.text = req.body.snyt.text;
@@ -216,8 +207,6 @@ app.post('/opretsnyt',upload.array('pic'),function (req,res) {
     newSnyt.created = req.body.snyt.created;
     newSnyt.edok = req.body.snyt.edok;
 
-
-    // newSnyt.pictures.push({filename: req.file.filename, orgName: req.file.originalname});
     for(p in req.files){
         newSnyt.pictures.push(req.files[p].filename);
     }
@@ -234,9 +223,8 @@ app.post('/opretsnyt',upload.array('pic'),function (req,res) {
     });
 });
 app.get('/updateSnyt/:id', function(req, res) {
-    //mangler sikkerhed: man kan stadig bypass ved at gå på url'en (altså hvis man ikke er den bruger der har oprettet SNYT'en) men vi synes ikke det er nødvendigt..
 
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -263,14 +251,14 @@ app.get('/updateSnyt/:id', function(req, res) {
 });
 
 app.post('/updateSnyt/:id', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
             snyt: null
         }
     };
-    var newsubsnyt = new SubSnyt();
+    let newsubsnyt = new SubSnyt();
     newsubsnyt.text = req.body.subsnyt.text;
     newsubsnyt.user = req.body.subsnyt.user;
     newsubsnyt.created = req.body.subsnyt.created;
@@ -295,7 +283,7 @@ app.post('/updateSnyt/:id', function(req, res) {
  * SNYT Read and mark as læsekvitteret routes
  */
 app.route('/snyt/:id').get(function (req, res) {
-    var returnJson = {
+    let returnJson = {
         errors : [],
         message : null,
         data : {
@@ -320,7 +308,7 @@ app.route('/snyt/:id').get(function (req, res) {
             }
             returnJson.data.subSnytsInSnyt = subdoc;
             returnJson.data.snyt = doc;
-            console.log(doc);res.render('showSnyt', returnJson);
+            res.render('showSnyt', returnJson);
         });
     }).catch(function (err) {
         returnJson.errors.push('Der skete en fejl under inlæsning af denne SNYT');
@@ -331,24 +319,18 @@ app.route('/snyt/:id').get(function (req, res) {
 
 // POST -  Mark a SNYT as læsekvitteret -> redirect to /
 app.post('/snyt/:id', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: null
     };
     let userID = req.session.loggedIn;
     Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {readBy: userID}})
-    // .exec()
         .catch(function(err) {
             returnJson.errors.push('Der skete en fejl da vi forsøgte at gemme din læsekvittering');
             returnJson.message = 'Der gik noget galt';
             res.render('showSnyt', returnJson);
         });
-    // Snyt.findOne({_id: req.params.id}).exec().then(function (doc) {
-    //     console.log(doc.readBy);
-    // }).catch(function (err) {
-    //     console.log('\n mere snyt \n' + err);
-    // });
 
     res.redirect('/snyt/' + req.params.id);
 });
@@ -357,7 +339,7 @@ app.post('/snyt/:id', function(req, res) {
  *
  */
 app.post('/editSnyt',upload.array('pic'), function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -366,11 +348,11 @@ app.post('/editSnyt',upload.array('pic'), function(req, res) {
     };
 
      if(res.locals.me.initials != req.body.snyt.user) {
-         returnJson.errors.push("Du kan ikke redigere i denne SNYT, da det ikke er dig der har lavet den")
-         res.redirect('/snyt/' + req.body.snyt._id)
+		returnJson.errors.push("Du kan ikke redigere i denne SNYT, da det ikke er dig der har lavet den")
+		res.redirect('/snyt/' + req.body.snyt._id)
      }
 
-    var newSnyt = new Snyt();
+    let newSnyt = new Snyt();
     newSnyt.subject = req.body.snyt.subject;
     newSnyt.category = req.body.snyt.category;
     newSnyt.text = req.body.snyt.text;
@@ -379,29 +361,11 @@ app.post('/editSnyt',upload.array('pic'), function(req, res) {
     newSnyt.edok = req.body.snyt.edok;
     newSnyt._id = req.body.snyt._id;
 
-
-    // 	Snyt.findOneAndUpdate({'_id': newSnyt._id}, {
-    // 		'subject': newSnyt.subject,
-    // 		'category': newSnyt.category,
-    // 		'text': newSnyt.text,
-    // 		'user': newSnyt.user,
-    // 		'created': newSnyt.created,
-    // 		'edok': newSnyt.edok
-    // 	}, {new: true}).exec().then(function(doc) {
-    // 		res.redirect('/snyt/' + req.body.snyt._id);
-    // 	}).catch(function(err) {
-    // 		returnJson.errors.push('Der skete en fejl da vi forsøgte at gemme din redigering');
-    // 		returnJson.message = 'Der gik noget galt';
-    // 		res.render('showSnyt', returnJson);
-    // 	});
-    // }
-    // console.log(req.files)
     for(p in req.files){
         newSnyt.pictures.push(req.files[p].filename);
     }
 
     Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok,$push: {pictures: newSnyt.pictures[0]}}, {new:true}).exec().then(function(doc) {
-        //TODO kan kun tilføje et billede af gangen pga hvis man skriver $push: {pictures: newSnyt.pictures} smider den selve arrayet ind i picture array'et der er i databasen (fremfor det der er indeni arrayet)
         res.redirect('/snyt/' + req.body.snyt._id);
 
     }).catch(function (err) {
@@ -409,49 +373,12 @@ app.post('/editSnyt',upload.array('pic'), function(req, res) {
         res.redirect('/snyt/' + req.body.snyt._id);
     });
 });
-// app.post('/editSnyt', function(req, res) {
-// 	var returnJson = {
-// 		errors: [],
-// 		message: null,
-// 		data: {
-// 			snyt: null
-// 		}
-// 	};
-//
-//     //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
-//
-//         var newSnyt = new Snyt();
-//         newSnyt.subject = req.body.snyt.subject;
-//         newSnyt.category = req.body.snyt.category;
-//         newSnyt.text = req.body.snyt.text;
-//         newSnyt.user = req.body.snyt.user;
-//         newSnyt.created = req.body.snyt.created;
-//         newSnyt.edok = req.body.snyt.edok;
-//         newSnyt._id = req.body.snyt._id;
-//
-// 		Snyt.findOneAndUpdate({'_id': newSnyt._id}, {
-// 			'subject': newSnyt.subject,
-// 			'category': newSnyt.category,
-// 			'text': newSnyt.text,
-// 			'user': newSnyt.user,
-// 			'created': newSnyt.created,
-// 			'edok': newSnyt.edok
-// 		}, {new: true}).exec().then(function(doc) {
-// 			if(me.initials == newSnyt.user){
-//                 res.redirect('/snyt/' + req.body.snyt._id);
-// 			}
-// 		}).catch(function(err) {
-// 			returnJson.errors.push('Der skete en fejl da vi forsøgte at gemme din redigering');
-// 			returnJson.message = 'Der gik noget galt';
-// 			res.render('showSnyt', returnJson);
-// 		});
-// 	});
 
 /*
  *
  */
 app.get('/editSnyt/:id', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -459,14 +386,11 @@ app.get('/editSnyt/:id', function(req, res) {
         }
     };
     Snyt.findById(req.params.id).exec().then(function(doc) {
-        //sikkerheds tjek om initialer passer med dem der har lavet SNYT'en
         if(res.locals.me.initials == doc.user) {
-            //fix dato
+
             let yyyy = doc.created.getFullYear();
             let mm = doc.created.getMonth() + 1;
             let dd = doc.created.getDate();
-
-            // console.log("DAAAY" + dd);
 
             if(dd < 10) {
                 dd = '0' + dd;
@@ -488,15 +412,19 @@ app.get('/editSnyt/:id', function(req, res) {
 });
 
 app.post('/deletePictures', function(req, res) {
-    //$pop
-    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pull: {pictures: req.body.pics }})
-        .catch(function (err) {
-            returnJson.errors.push(err);
-            res.render('index', returnJson);
-        });
 
-    // Snyt.find({"_id" : mongoose.Types.ObjectId(req.body.id)})
-    // console.log(req.body);
+    let returnJson = {
+        errors: [],
+        message: null,
+        data: {
+            snyt: null
+        }
+    };
+    Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pull: {pictures: {$in : req.body.pics }}}).exec(function(err, doc) {
+	})
+	.catch(function (err) {
+		returnJson.errors.push(err);
+	});
 });
 
 //----------------------------------------------
@@ -506,7 +434,7 @@ app.post('/deletePictures', function(req, res) {
  * Alle snyt
  */
 app.get('/search', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -532,27 +460,27 @@ app.get('/search', function(req, res) {
  * Almindelig søgning
  */
 app.get('/search/:text', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors : [],
         message : null,
         data : {
             snyt: null
         }
     };
-    var words = req.params.text.split(" ");
-    var regexs = [];
+    let words = req.params.text.split(" ");
+    let regexs = [];
     words.forEach(function(word) {
         regexs.push(new RegExp("\\b(" + word + ")" + "\\b", "i"));
     });
-    var subjectRegs = [];
+    let subjectRegs = [];
     regexs.forEach(function(i) {
         subjectRegs.push({"subject" : i});
     });
-    var textRegs = [];
+    let textRegs = [];
     regexs.forEach(function(i) {
         textRegs.push({"text" : i});
     });
-    var searchObject = {
+    let searchObject = {
         "$or" : [
             {
                 "$or" : subjectRegs
@@ -580,26 +508,26 @@ app.get('/search/:text', function(req, res) {
  * Avanceret søgning
  */
 app.post('/search', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors : [],
         message : null,
         data : {
             snyt: null
         }
     };
-    var text = req.body.text;
-    var dateFrom = new Date(req.body.dateFrom);
-    var dateTo = new Date(req.body.dateTo);
+    let text = req.body.text;
+    let dateFrom = new Date(req.body.dateFrom);
+    let dateTo = new Date(req.body.dateTo);
     dateTo.setHours(24);
     dateTo.setMinutes(59);
     dateTo.setSeconds(59);
     dateFrom = dateFrom.toISOString();
     dateTo = dateTo.toISOString();
-    var read = req.body.advRadioButtons;
-    var category = req.body.category;
-    var readOption = {};
-    var categoryOption = {};
-    var textOption = {};
+    let read = req.body.advRadioButtons;
+    let category = req.body.category;
+    let readOption = {};
+    let categoryOption = {};
+    let textOption = {};
     if(read == "true") {
         readOption = {"readBy" : {"$in" : [res.locals.me._id.toString()]}};
     } else if(read == "false") {
@@ -609,16 +537,16 @@ app.post('/search', function(req, res) {
         categoryOption = {"category" : category};
     }
     if(text.length > 0) {
-        var words = req.body.text.split(" ");
-        var regexs = [];
+        let words = req.body.text.split(" ");
+        let regexs = [];
         words.forEach(function(word) {
             regexs.push(new RegExp("\\b(" + word + ")" + "\\b", "i"));
         });
-        var subjectRegs = [];
+        let subjectRegs = [];
         regexs.forEach(function(i) {
             subjectRegs.push({"subject" : i});
         });
-        var textRegs = [];
+        let textRegs = [];
         regexs.forEach(function(i) {
             textRegs.push({"text" : i});
         });
@@ -634,7 +562,7 @@ app.post('/search', function(req, res) {
         };
     }
 
-    var searchObject = {
+    let searchObject = {
         "$and" :
             [
                 categoryOption,
@@ -668,8 +596,8 @@ app.post('/search', function(req, res) {
  * Login som admin
  */
 app.post('/admin/login', function(req, res) {
-    var adminUsername = 'administrator';
-    var adminPassword = 'pokemon';
+    let adminUsername = 'administrator';
+    let adminPassword = 'pokemon';
 
     if(req.body.adminUsername == adminUsername && req.body.adminPassword == adminPassword) {
         req.session.adminLoggedIn = 'thisIsAdmin';
@@ -681,7 +609,7 @@ app.post('/admin/login', function(req, res) {
  * Get admin side (login side hvis man ikke er authenticated)
  */
 app.get('/admin', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -698,7 +626,6 @@ app.get('/admin', function(req, res) {
         if(err) {
             returnJson.errors.push('Der skete en fejl, prøv at genindlæse siden');
         }
-        console.log(returnJson.errors);
         res.render('admin', returnJson);
     });
 });
@@ -707,7 +634,7 @@ app.get('/admin', function(req, res) {
  * Opret ny bruger i systemet
  */
 app.post('/admin', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: 'Brugeren blev gemt',
         data: null
@@ -728,21 +655,13 @@ app.post('/admin', function(req, res) {
             if(doc.length > 0) {
                 returnJson.errors.push('Bruger med disse initialer eksisterer allerede');
             }
-            var newUser = new User();
+            let newUser = new User();
             newUser.first = req.body.user.first;
             newUser.last = req.body.user.last;
             newUser.initials = req.body.user.initials;
             newUser.email = req.body.user.email;
             newUser.password = req.body.user.password;
 
-            // var AddNewUserToAllSnyts = function() {
-            //     Snyt.find().exec().then(function (snyt) {
-            //         for (var n in snyt) {
-            //             console.log(n + '_:_ '+snyt[n]);
-            //             snyt[n].notReadBy.push(newUser[n]._id);
-            //         }
-            //     });
-            // }();
             if(returnJson.errors.length > 0) {
                 returnJson.message = "Der gik noget galt";
                 res.render("admin", returnJson);
@@ -765,8 +684,8 @@ app.post('/admin', function(req, res) {
  * Hjælpefunktion til at få ID på en bruger med email og password i POST
  */
 app.post('/admin/user', function(req, res) {
-    var email = req.body.email;
-    var password = req.body.password;
+    let email = req.body.email;
+    let password = req.body.password;
 
     User.findOne({'email': email, 'password': password}).exec(function(err, doc) {
         if(doc.length == 0) {
@@ -783,7 +702,7 @@ app.post('/admin/user', function(req, res) {
  * Rediger en bruger
  */
 app.post('/admin/:userid', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: null
@@ -821,7 +740,7 @@ app.post('/admin/:userid', function(req, res) {
  * Slet en bruger
  */
 app.delete('/admin', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: null
@@ -829,7 +748,6 @@ app.delete('/admin', function(req, res) {
     User.find({'_id': mongoose.Types.ObjectId(req.body.id)}).remove(function(err, doc) {
         if(err || doc.result.n == 0) {
             returnJson.errors.push("Kunne ikke slette");
-            console.log(doc);
             res.render("admin", returnJson);
         } else {
             res.redirect("/admin");
@@ -863,7 +781,7 @@ app.get('/admin/users', function(req, res) {
 });
 
 app.get('/kvitoversigt', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -899,7 +817,7 @@ app.get('/kvitoversigt', function(req, res) {
 });
 
 app.get('/kvit/:id', function(req, res) {
-    var returnJson = {
+    let returnJson = {
         errors: [],
         message: null,
         data: {
@@ -933,17 +851,11 @@ app.get('/kvit/:id', function(req, res) {
 // Listen(), exports and test misc
 //**********************************************************************
 
-//Start it up!!! WOOP WOOP WOOP SNYT++ 4 lyfe
-//if (!module.parent) {
-//    app.listen(1337);
-//    console.log("Listening on port 1337...");
-//}
-
 // We need to use the returned value from listen() to be able to close it again.
-var server = app.listen(1337);
+let server = app.listen(1337);
 
 // Used for tests to shut down the server again.
-var shutdown = function() {
+let shutdown = function() {
     console.log('Server shutting down...');
     mongoose.connection.close();
     server.close();

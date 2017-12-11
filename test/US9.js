@@ -1,7 +1,6 @@
 let assert = require('chai').assert;
 let request = require('supertest');
 let app = require("../app").app;
-let shutdown = require("../app").shutdown;
 
 let agent = request.agent(app);
 

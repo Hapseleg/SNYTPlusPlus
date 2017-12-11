@@ -1,4 +1,4 @@
-var shutdown = require('../app').shutdown;
+let shutdown = require('../app').shutdown;
 after(function(done) {
     shutdown();
     done();

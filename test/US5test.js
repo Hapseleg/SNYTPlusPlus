@@ -1,7 +1,7 @@
-// During the test the env variable is set to test
+// During the test the env letiable is set to test
 process.env.NODE_ENV = 'test';
 
-var sejeId;
+let sejeId;
 let subject = 'us5test';
 let category = 'catg';
 let text = 'mad mad mad';
@@ -10,11 +10,9 @@ let eDok = 'eodk';
 
 const assert = require('chai').assert;
 let app = require('../app').app;
-let shutdown = require('../app').shutdown;
 let Snyt = require('../models/Snyt.model');
 let User = require('../models/User.model');
 let request = require('supertest');
-let should = require('should');
 
 let login_details = {
     user: {
@@ -23,12 +21,8 @@ let login_details = {
     }
 };
 
-let userDetails = {
-
-};
-
 function createTestSnyt (done){
-    var nysnyt = new Snyt();
+    let nysnyt = new Snyt();
     nysnyt.subject = subject;
     nysnyt.category = category;
     nysnyt.text = text;
@@ -45,17 +39,15 @@ function createTestSnyt (done){
 }
 describe('US5: Læsekvittere a SNYT', function() {
     let uid;
-    let us5SNYT;
     before(function(done) {
         Snyt.remove( {subject: subject}).exec();
         User.findOne(login_details.user).exec().then(function(user) {
             uid = user._id;
-            console.log(user);
         });
         createTestSnyt(done);
     });
 
-    var agent = request.agent(app);
+    let agent = request.agent(app);
 
     describe('/snyt/:id post route should læsekvittere', function () {
         it('Should be logged in to læsekvittere', function(done) {
@@ -72,8 +64,6 @@ describe('US5: Læsekvittere a SNYT', function() {
 
         it('SNYT should be læsekvitteret now', function(done) {
             Snyt.findOne({ _id: sejeId}).exec().then(function(snyt) {
-                console.log(snyt);
-                console.log(uid);
                 let hasRead = snyt.readBy.indexOf(uid) > -1;
                 assert.equal(true, hasRead);
                 done();

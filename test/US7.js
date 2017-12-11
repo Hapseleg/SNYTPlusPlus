@@ -1,13 +1,13 @@
 process.env.NODE_ENV = 'test';
-var assert = require('chai').assert;
-var chai = require('chai');
-var request = require('supertest');
-var chaiHttp = require('chai-http');
+let assert = require('chai').assert;
+let chai = require('chai');
+let request = require('supertest');
+let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
-var Snyt = require('../models/Snyt.model');
-var app = require('../app').app;
+let Snyt = require('../models/Snyt.model');
+let app = require('../app').app;
 
-var login_details = {
+let login_details = {
     user: {
         email: 'dndwd@djkw.ad',
         password: '123'
@@ -15,15 +15,15 @@ var login_details = {
 };
 
 
-var sejeId;
-var subject = 'US7 test';
-var category = 'AC';
-var text = 'et eller andet';
-var user = 'FE';
-var eDok = 'noget';
+let sejeId;
+let subject = 'US7 test';
+let category = 'AC';
+let text = 'et eller andet';
+let user = 'FE';
+let eDok = 'noget';
 
 function createTestSnyt (done){
-    var nysnyt = new Snyt();
+    let nysnyt = new Snyt();
     nysnyt.subject = subject;
     nysnyt.category = category;
     nysnyt.text = text;
@@ -45,16 +45,14 @@ describe('US7: create an update to snyt', function () {
         createTestSnyt(done);
     });
 
-    var agent = request.agent(app);
+    let agent = request.agent(app);
 
     before(function (done) {
-        //Post request to log in.
         agent
             .post('/')
             .type('form')
             .send(login_details)
             .end(function(err, res) {
-                // post request to create a subSNYT
                 agent
                     .post('/updateSnyt/'+sejeId)
                     .type('form')
@@ -72,7 +70,6 @@ describe('US7: create an update to snyt', function () {
     });
         it('snyt contains', function (done) {
             Snyt.findById(sejeId).exec(function(err, doc) {
-                console.log(doc);
                 assert.isNotEmpty(doc.idSubSnyts);
                 done();
             });
