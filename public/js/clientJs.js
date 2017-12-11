@@ -1,19 +1,19 @@
 $(document).ready(function() {
-	var now = new Date();
-	var dayNow = ('0' + now.getDate()).slice(-2);
-	var monthNow = ('0' + (now.getMonth() + 1)).slice(-2);
-	var today = now.getFullYear() + '-' + (monthNow) + '-' + (dayNow);
+	let now = new Date();
+	let dayNow = ('0' + now.getDate()).slice(-2);
+	let monthNow = ('0' + (now.getMonth() + 1)).slice(-2);
+	let today = now.getFullYear() + '-' + (monthNow) + '-' + (dayNow);
 	$('#advDateTo').val(today);
 
-	var before = new Date();
+	let before = new Date();
 	before.setMonth(before.getMonth() - 2);
-	var dayBefore = ('0' + before.getDate()).slice(-2);
-	var monthBefore = ('0' + (before.getMonth() + 1)).slice(-2);
-	var dateBefore = before.getFullYear() + '-' + (monthBefore) + '-' + (dayBefore);
+	let dayBefore = ('0' + before.getDate()).slice(-2);
+	let monthBefore = ('0' + (before.getMonth() + 1)).slice(-2);
+	let dateBefore = before.getFullYear() + '-' + (monthBefore) + '-' + (dayBefore);
 	$('#advDateFrom').val(dateBefore);
 
 	$('#advancedSearch').on('keyup keypress', function(e) {
-		var keyCode = e.keyCode || e.which;
+		let keyCode = e.keyCode || e.which;
 		if(keyCode === 13) {
 			e.preventDefault();
 		}
@@ -38,7 +38,7 @@ $(document).ready(function() {
 });
 
 function regularSearch() {
-	var searchText = $('#regularSearchText').val();
+	let searchText = $('#regularSearchText').val();
 	if(searchText.length > 1) {
 		searchText = '/' + searchText;
 	}
@@ -55,12 +55,12 @@ function advancedSearch() {
 }
 
 function gotoSnyt(row) {
-	var id = $(row).data('href');
+	let id = $(row).data('href');
 	window.location.href = '/snyt/' + id;
 }
 
 function gotoSnytKvit(row) {
-	var id = $(row).data('href');
+	let id = $(row).data('href');
 	window.location.href = '/kvit/' + id;
 }
 
@@ -70,7 +70,7 @@ function goBack() {
 
 //admin CRUD
 function findUser(caller) {
-	var user = $(caller).find('a').data('user');
+	let user = $(caller).find('a').data('user');
 	$('#editModal').find('#first').val(user.first);
 	$('#editModal').find('#last').val(user.last);
 	$('#editModal').find('#initials').val(user.initials);
@@ -82,11 +82,11 @@ function findUser(caller) {
 
 function createUser() {
 
-	var fornavn = $('#fornavn').val();
-	var efternavn = $('#efternavn').val();
-	var initialer = $('#initialer').val();
-	var email = $('#email').val();
-	var password = $('#password').val();
+	let fornavn = $('#fornavn').val();
+	let efternavn = $('#efternavn').val();
+	let initialer = $('#initialer').val();
+	let email = $('#email').val();
+	let password = $('#password').val();
 
 	// validering
 
@@ -125,12 +125,12 @@ function createUser() {
 
 function updateUser() {
 
-	var first = $('#editModal').find('#first').val();
-	var last = $('#editModal').find('#last').val();
-	var initials = $('#editModal').find('#initials').val();
-	var email = $('#editModal').find('#email').val();
-	var password = $('#editModal').find('#password').val();
-	var id = $('#editModal').find('#id').val();
+	let first = $('#editModal').find('#first').val();
+	let last = $('#editModal').find('#last').val();
+	let initials = $('#editModal').find('#initials').val();
+	let email = $('#editModal').find('#email').val();
+	let password = $('#editModal').find('#password').val();
+	let id = $('#editModal').find('#id').val();
 
 	// validering
 	if(!first.length > 0) {
@@ -149,7 +149,6 @@ function updateUser() {
 		alert('Adgangskode skal udfyldes');
 	}
 	else {
-		console.log('Starting AJAX request');
 		$.post('/admin/' + id,
 			{
 				first: first,
@@ -167,9 +166,7 @@ function updateUser() {
 }
 
 function deleteUser() {
-	var id = $('#editModal').find('#id').val();
-	console.log(id);
-	console.log('Starting AJAX request');
+	let id = $('#editModal').find('#id').val();
 	$.ajax({
 		url: '/admin',
 		data: {id: id},
@@ -184,7 +181,7 @@ function deleteUser() {
 
 //https://www.w3schools.com/howto/howto_js_sort_table.asp
 function sortTable(n) {
-	var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+	let table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
 	table = document.getElementsByClassName('table');
 	switching = true;
 	// Set the sorting direction to ascending:
@@ -241,18 +238,13 @@ function sortTable(n) {
 
 //*******************************************
 //used in editsnyt to delete pictures
-var toBeDeletedPics = [];
+let toBeDeletedPics = [];
 function addPicToDelete(picid) {
-    //get id fra this (det er filename) og add til array og grey out i html
-    // console.log(toBeDeletedPics);
 
-	// console.log($('#'+picid).css("border"));
-	// if($('#'+picid).css("filter") == "grayscale(1)"){
     if($('#'+picid).css("border") == "10px solid rgb(255, 0, 0)"){
         $('#'+picid).css("border", "0px solid red");
-        // $('#'+picid).css("filter", "grayscale(0%)");
 
-        for(var i = toBeDeletedPics.length -1; i >= 0; i--) {
+        for(let i = toBeDeletedPics.length -1; i >= 0; i--) {
             if (toBeDeletedPics[i] == picid) {
                 toBeDeletedPics.splice(i, 1);
             }
@@ -261,17 +253,12 @@ function addPicToDelete(picid) {
 	}
 	else{
         $('#'+picid).css("border", "10px solid red");
-        // $('#'+picid).css("filter", "grayscale(100%)");
         toBeDeletedPics.push(picid)
 	}
-	// console.log(toBeDeletedPics);
 }
 
 function deletePictures(row) {
-    var id = $(row).data("href");
-    console.log(id);
-	// console.log(snytid);
-	//slet alle i array
+    let id = $(row).data("href");
     $.post("/deletePictures",
         {
         	pics: toBeDeletedPics,

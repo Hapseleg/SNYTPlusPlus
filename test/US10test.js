@@ -1,7 +1,7 @@
-// During the test the env variable is set to test
+// During the test the env letiable is set to test
 process.env.NODE_ENV = 'test';
 
-var sejeId;
+let sejeId;
 let subject = 'us10test';
 let category = 'catg';
 let text = 'mad mad mad';
@@ -10,10 +10,8 @@ let eDok = 'eodk';
 
 const assert = require('chai').assert;
 let app = require('../app').app;
-let shutdown = require('../app').shutdown;
 let Snyt = require('../models/Snyt.model');
 let request = require('supertest');
-let should = require('should');
 
 let login_details = {
     user: {
@@ -23,7 +21,7 @@ let login_details = {
 };
 
 function createTestSnyt (done){
-    var nysnyt = new Snyt();
+    let nysnyt = new Snyt();
     nysnyt.subject = subject;
     nysnyt.category = category;
     nysnyt.text = text;
@@ -40,13 +38,13 @@ function createTestSnyt (done){
 }
 
 function findsnyt(body) {
-    var edk = /edok]" href="(.[^"]+)/.exec(body)[0].substring(13);
-    var sub = /subject]" value="(.[^"]+)/.exec(body)[0].substring(17);
-    var cat = /category]" value="(.[^"]+)/.exec(body)[0].substring(18);
-    var use = /user]" value="(.[^"]+)/.exec(body)[0].substring(14);
-    var cre = /created]" value="(.[^"]+)/.exec(body)[0].substring(17);
-    var tex = /text]">(.[^<]+)/.exec(body)[0].substring(7);
-    var snyt2 = {
+    let edk = /edok]" href="(.[^"]+)/.exec(body)[0].substring(13);
+    let sub = /subject]" value="(.[^"]+)/.exec(body)[0].substring(17);
+    let cat = /category]" value="(.[^"]+)/.exec(body)[0].substring(18);
+    let use = /user]" value="(.[^"]+)/.exec(body)[0].substring(14);
+    let cre = /created]" value="(.[^"]+)/.exec(body)[0].substring(17);
+    let tex = /text]">(.[^<]+)/.exec(body)[0].substring(7);
+    let snyt2 = {
         edok: edk,
         subject: sub,
         category: cat,
@@ -63,20 +61,17 @@ describe('US10: Read a SNYT', function () {
         createTestSnyt(done);
     });
     
-    var agent = request.agent(app);
+    let agent = request.agent(app);
 
     describe('/snyt/:id route should show correct info', function () {
-        let snyt1; // Snyt to be tested
+        let snyt1;
         it('Should be logged in to show SNYT', function (done) {
-            //Post request to log in.
             agent.post('/')
                 .type('form')
                 .send(login_details)
                 .end(function(err, res) {
-                    // Get request to show a SNYT
                     agent.get('/snyt/' + sejeId)
                         .end(function(err, res) {
-
                             snyt1 = findsnyt(res.text);
                             done();
                         });
@@ -84,11 +79,6 @@ describe('US10: Read a SNYT', function () {
         });
 
         it('Snyt is the same', function (done) {
-            console.log(snyt1.subject + '\n'+subject);
-            console.log(snyt1.category + '\n'+category);
-            console.log(snyt1.text + '\n'+text);
-            console.log(snyt1.user + '\n'+user);
-            console.log(snyt1.edok + '\n'+eDok);
             assert.equal(snyt1.subject, subject);
             assert.equal(snyt1.category, category);
             assert.equal(snyt1.text, text);
