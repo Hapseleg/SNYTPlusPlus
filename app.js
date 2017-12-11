@@ -9,7 +9,9 @@ let express = require('express'),
     morgan = require('morgan'),
     mongoose = require('mongoose'),
     multer = require('multer'),
-    upload = multer({ dest: 'public/uploads'}),rp = require('request-promise'),
+    upload = multer({ dest: 'public/uploads'}),
+    rp = require('request-promise'),
+    fs = require('fs'),
     config = require('config'),
     SubSnyt = require('./models/Subsnyt.model'),
     Snyt = require('./models/Snyt.model'),
@@ -268,7 +270,7 @@ app.post('/updateSnyt/:id', function(req, res) {
             returnJson.errors.push('Der skete en fejl da vi forsøgte at gemme din opdatering');
         }
 
-        Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id}}).exec(function(err, doc) {
+        Snyt.findOneAndUpdate({_id: req.params.id}, {$push: {idSubSnyts: subsnyt.id}, readBy : []}).exec(function(err, doc) {
             res.redirect('/snyt/' + req.params.id);
         })
             .catch(function(err) {
@@ -365,7 +367,7 @@ app.post('/editSnyt',upload.array('pic'), function(req, res) {
         newSnyt.pictures.push(req.files[p].filename);
     }
 
-    Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok,$push: {pictures: newSnyt.pictures[0]}}, {new:true}).exec().then(function(doc) {
+    Snyt.findOneAndUpdate({"_id":newSnyt._id},{"subject": newSnyt.subject, "category" : newSnyt.category, "text" : newSnyt.text, "user":newSnyt.user,"created":newSnyt.created,"edok":newSnyt.edok,$push: {pictures: {$each : newSnyt.pictures}}}, {new:true}).exec().then(function(doc) {
         res.redirect('/snyt/' + req.body.snyt._id);
 
     }).catch(function (err) {
@@ -420,6 +422,14 @@ app.post('/deletePictures', function(req, res) {
             snyt: null
         }
     };
+
+    for(p in req.body.pics) {
+        fs.unlink("public/uploads/" + req.body.pics[p], function(err) {
+            if(err) {
+                returnJson.errors.push(err.toString());
+            }
+        });
+    }
     Snyt.findOneAndUpdate({_id: req.body.snytid}, {$pull: {pictures: {$in : req.body.pics }}}).exec(function(err, doc) {
 	})
 	.catch(function (err) {
