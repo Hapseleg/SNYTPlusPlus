@@ -11,7 +11,7 @@ let login = {
     }
 };
 
-let snytEditId = "5a2a131b6835fd44b4476359";
+let snytEditId = "5a2e420180f28a3ebcbf8b13";
 
 describe("Rediger snyt", function() {
 
@@ -51,7 +51,7 @@ describe("Rediger snyt", function() {
                 }
             })
             .end(function(err, res) {
-                assert.isNotNull(res.text.match(new RegExp(/html/, "g")));
+                assert.isNull(res.text.match(new RegExp(/html/, "g")));
                 done();
             });
     });
